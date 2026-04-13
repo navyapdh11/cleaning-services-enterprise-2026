@@ -1,0 +1,129 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "cleanpro-enterprise",
+    "title": "CleanPro Enterprise - Service Monitoring",
+    "tags": ["cleaning-services", "enterprise"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "10s",
+    "time": { "from": "now-6h", "to": "now" },
+    "panels": [
+      {
+        "id": 1,
+        "title": "API Request Rate",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          { "expr": "rate(http_requests_total{job=\"backend\"}[5m])", "legendFormat": "{{method}} {{status}}" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2 }, "unit": "reqps" } }
+      },
+      {
+        "id": 2,
+        "title": "API Latency (p95)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          { "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"backend\"}[5m]))", "legendFormat": "p95" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "red", "value": 1.0 }] }, "unit": "s" } }
+      },
+      {
+        "id": 3,
+        "title": "Active Bookings",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+        "targets": [
+          { "expr": "booking_status_total{status=\"active\"}" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "blue" }, "thresholds": { "steps": [{ "color": "green", "value": null }] } } }
+      },
+      {
+        "id": 4,
+        "title": "Revenue Today",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+        "targets": [
+          { "expr": "sum(payment_amount_total{status=\"completed\"})", "legendFormat": "Revenue" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" }, "unit": "currencyUSD", "decimals": 2 } }
+      },
+      {
+        "id": 5,
+        "title": "Error Rate",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [
+          { "expr": "rate(http_requests_total{job=\"backend\",status=~\"5..\"}[5m]) / rate(http_requests_total{job=\"backend\"}[5m]) * 100", "legendFormat": "Error %" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "red" }, "unit": "percent", "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] } } }
+      },
+      {
+        "id": 6,
+        "title": "Database Connection Pool",
+        "type": "gauge",
+        "gridPos": { "h": 6, "w": 6, "x": 0, "y": 12 },
+        "targets": [
+          { "expr": "pg_stat_activity_count{datname=\"cleaning_services\"}" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 80 }, { "color": "red", "value": 95 }] }, "max": 100, "unit": "short" } }
+      },
+      {
+        "id": 7,
+        "title": "Redis Memory Usage",
+        "type": "gauge",
+        "gridPos": { "h": 6, "w": 6, "x": 6, "y": 12 },
+        "targets": [
+          { "expr": "redis_memory_used_bytes / redis_memory_max_bytes * 100" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 90 }] }, "unit": "percent" } }
+      },
+      {
+        "id": 8,
+        "title": "Service Response Times by Endpoint",
+        "type": "heatmap",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+        "targets": [
+          { "expr": "rate(http_request_duration_seconds_bucket{job=\"backend\"}[5m])", "format": "heatmap" }
+        ],
+        "fieldConfig": { "defaults": { "custom": { "color": { "mode": "continuous-BlYlRd" } } } }
+      },
+      {
+        "id": 9,
+        "title": "Booking Status Distribution",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+        "targets": [
+          { "expr": "booking_status_total", "legendFormat": "{{status}}" }
+        ],
+        "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } }
+      },
+      {
+        "id": 10,
+        "title": "User Activity (Last 24h)",
+        "type": "timeseries",
+        "gridPos": { "h": 6, "w": 12, "x": 0, "y": 26 },
+        "targets": [
+          { "expr": "rate(user_login_total[24h])", "legendFormat": "Logins" },
+          { "expr": "rate(user_registration_total[24h])", "legendFormat": "Registrations" }
+        ],
+        "fieldConfig": { "defaults": { "custom": { "lineWidth": 2, "fillOpacity": 20 } } }
+      }
+    ],
+    "templating": {
+      "list": [
+        { "name": "datasource", "type": "datasource", "query": "prometheus", "current": { "text": "Prometheus", "value": "Prometheus" } },
+        { "name": "service", "type": "query", "datasource": "$datasource", "query": "label_values(http_requests_total, job)", "current": { "text": "backend", "value": "backend" } }
+      ]
+    },
+    "annotations": {
+      "list": [
+        { "builtIn": 1, "datasource": "-- Grafana --", "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "type": "dashboard" }
+      ]
+    }
+  },
+  "folderId": 0,
+  "overwrite": true
+}
