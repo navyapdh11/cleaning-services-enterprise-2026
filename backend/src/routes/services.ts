@@ -17,7 +17,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     const search = req.query.search as string | undefined;
     const { skip, take } = paginate(page, limit);
 
-    const where: any = { isActive: true };
+    const where: Record<string, any> = { isActive: true };
     if (type) where.type = type;
     if (search) where.OR = [{ name: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }];
 
@@ -56,7 +56,7 @@ router.post('/', authenticate, authorize('ADMIN', 'MANAGER'),
 router.put('/:id', authenticate, authorize('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { name, description, type, duration, basePrice, features, imageUrl, isActive } = req.body;
-    const data: any = { description, type, duration, basePrice, features, imageUrl, isActive };
+    const data: Record<string, any> = { description, type, duration, basePrice, features, imageUrl, isActive };
     if (name) { data.name = name; data.slug = generateSlug(name); }
     const service = await prisma.service.update({ where: { id: req.params.id }, data });
     return successResponse(res, service, 'Service updated');

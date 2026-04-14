@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "CleanPro Cleaner",
+    "slug": "cleanpro-cleaner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0EA5E9"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cleanpro.cleaner",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "CleanPro Cleaner needs your location to show job locations and enable check-in at job sites.",
+        "NSCameraUsageDescription": "CleanPro Cleaner needs camera access to take before and after photos of cleaning jobs.",
+        "NSPhotoLibraryUsageDescription": "CleanPro Cleaner needs photo library access to upload before and after photos of cleaning jobs.",
+        "NSUserNotificationsUsageDescription": "CleanPro Cleaner sends notifications about new job assignments and schedule changes."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0EA5E9"
+      },
+      "package": "com.cleanpro.cleaner",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-location",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#0EA5E9"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cleanpro-cleaner"
+      }
+    }
+  }
+}

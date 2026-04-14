@@ -10,10 +10,14 @@ export interface ApiResponse<T = unknown> {
     total?: number;
     totalPages?: number;
   };
+  message?: string;
 }
 
-export const successResponse = <T>(res: Response, data: T, message?: string, meta?: ApiResponse['meta']) => {
-  return res.json({ success: true, data, ...(meta && { meta }), ...(message && { message }) });
+export const successResponse = <T>(res: Response, data: T, message?: string, statusCode?: number) => {
+  if (statusCode) {
+    res.status(statusCode);
+  }
+  return res.json({ success: true, data, ...(message && { message }) });
 };
 
 export const paginatedResponse = <T>(

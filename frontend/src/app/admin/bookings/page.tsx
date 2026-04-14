@@ -1,0 +1,434 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import {
+  LayoutDashboard,
+  Calendar,
+  Users,
+  UserCheck,
+  Search,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  Edit,
+  Trash2,
+  MoreHorizontal,
+  Download,
+  Plus,
+  Menu,
+  X,
+  Bell,
+} from 'lucide-react';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+
+const SIDEBAR_LINKS = [
+  { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
+  { icon: Calendar, label: 'Bookings', href: '/admin/bookings' },
+  { icon: Users, label: 'CRM', href: '/admin/crm' },
+  { icon: UserCheck, label: 'Cleaners', href: '/admin/cleaners' },
+];
+
+const ALL_BOOKINGS = [
+  { id: 'BK-001', customer: 'Emma Thompson', email: 'emma@email.com', service: 'Deep Cleaning', date: '2026-04-14', time: '09:00', address: '12 Bondi Rd, Bondi', suburb: 'Bondi', status: 'confirmed', amount: 250, cleaner: 'Sarah M.', bedrooms: 3, bathrooms: 2 },
+  { id: 'BK-002', customer: 'James Wilson', email: 'james@email.com', service: 'End of Lease', date: '2026-04-14', time: '10:00', address: '45 Manly St, Manly', suburb: 'Manly', status: 'pending', amount: 350, cleaner: null, bedrooms: 2, bathrooms: 1 },
+  { id: 'BK-003', customer: 'Sarah Chen', email: 'sarah@email.com', service: 'Standard', date: '2026-04-15', time: '08:00', address: '78 George St, Surry Hills', suburb: 'Surry Hills', status: 'confirmed', amount: 120, cleaner: 'Maria L.', bedrooms: 1, bathrooms: 1 },
+  { id: 'BK-004', customer: 'Michael Brown', email: 'michael@email.com', service: 'Office Cleaning', date: '2026-04-15', time: '14:00', address: '100 Pitt St, Sydney', suburb: 'Sydney CBD', status: 'completed', amount: 200, cleaner: 'James K.', bedrooms: 0, bathrooms: 2 },
+  { id: 'BK-005', customer: 'Lisa Anderson', email: 'lisa@email.com', service: 'Carpet Cleaning', date: '2026-04-16', time: '11:00', address: '23 King St, Newtown', suburb: 'Newtown', status: 'confirmed', amount: 150, cleaner: 'Sarah M.', bedrooms: 4, bathrooms: 2 },
+  { id: 'BK-006', customer: 'David Park', email: 'david@email.com', service: 'Window Cleaning', date: '2026-04-16', time: '09:00', address: '56 Oxford St, Paddington', suburb: 'Paddington', status: 'pending', amount: 100, cleaner: null, bedrooms: 2, bathrooms: 1 },
+  { id: 'BK-007', customer: 'Rachel Green', email: 'rachel@email.com', service: 'Deep Cleaning', date: '2026-04-17', time: '10:00', address: '89 Harris St, Pyrmont', suburb: 'Pyrmont', status: 'confirmed', amount: 280, cleaner: 'Maria L.', bedrooms: 3, bathrooms: 2 },
+  { id: 'BK-008', customer: 'Tom Harris', email: 'tom@email.com', service: 'Standard', date: '2026-04-17', time: '13:00', address: '12 Victoria Rd, Drummoyne', suburb: 'Drummoyne', status: 'cancelled', amount: 120, cleaner: null, bedrooms: 2, bathrooms: 1 },
+  { id: 'BK-009', customer: 'Amy White', email: 'amy@email.com', service: 'End of Lease', date: '2026-04-18', time: '08:00', address: '34 Military Rd, Neutral Bay', suburb: 'Neutral Bay', status: 'pending', amount: 350, cleaner: null, bedrooms: 2, bathrooms: 2 },
+  { id: 'BK-010', customer: 'Chris Lee', email: 'chris@email.com', service: 'Pressure Washing', date: '2026-04-18', time: '09:00', address: '67 Pacific Hwy, Chatswood', suburb: 'Chatswood', status: 'confirmed', amount: 200, cleaner: 'James K.', bedrooms: 0, bathrooms: 0 },
+];
+
+const statusColors: Record<string, string> = {
+  confirmed: 'bg-green-100 text-green-700',
+  pending: 'bg-yellow-100 text-yellow-700',
+  completed: 'bg-blue-100 text-blue-700',
+  cancelled: 'bg-red-100 text-red-700',
+};
+
+const CLEANERS = ['Sarah M.', 'James K.', 'Maria L.', 'John D.', 'Anna S.'];
+
+export default function AdminBookings() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [bookingToAssign, setBookingToAssign] = useState<string | null>(null);
+  const [selectedCleaner, setSelectedCleaner] = useState('');
+
+  const filteredBookings = ALL_BOOKINGS
+    .filter((b) => {
+      const matchesSearch =
+        b.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        b.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        b.suburb.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || b.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      const aVal = a[sortBy as keyof typeof a];
+      const bVal = b[sortBy as keyof typeof b];
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+      return sortOrder === 'asc' ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+    });
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedBookings(filteredBookings.map((b) => b.id));
+    } else {
+      setSelectedBookings([]);
+    }
+  };
+
+  const handleSelect = (id: string) => {
+    setSelectedBookings((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleAssignCleaner = () => {
+    if (bookingToAssign && selectedCleaner) {
+      // Update booking with assigned cleaner
+      console.log(`Assigning ${selectedCleaner} to ${bookingToAssign}`);
+      setShowAssignModal(false);
+      setBookingToAssign(null);
+      setSelectedCleaner('');
+    }
+  };
+
+  const handleBulkAction = (action: string) => {
+    console.log(`Bulk ${action} on ${selectedBookings.length} bookings`);
+    setSelectedBookings([]);
+  };
+
+  const handleExport = () => {
+    const csv = [
+      ['ID', 'Customer', 'Service', 'Date', 'Time', 'Status', 'Amount'].join(','),
+      ...filteredBookings.map((b) =>
+        [b.id, b.customer, b.service, b.date, b.time, b.status, b.amount].join(',')
+      ),
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bookings-export.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const stats = {
+    total: ALL_BOOKINGS.length,
+    pending: ALL_BOOKINGS.filter((b) => b.status === 'pending').length,
+    confirmed: ALL_BOOKINGS.filter((b) => b.status === 'confirmed').length,
+    completed: ALL_BOOKINGS.filter((b) => b.status === 'completed').length,
+    cancelled: ALL_BOOKINGS.filter((b) => b.status === 'cancelled').length,
+    revenue: ALL_BOOKINGS.filter((b) => b.status !== 'cancelled').reduce((sum, b) => sum + b.amount, 0),
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Header />
+
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold">Admin Panel</h2>
+            <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <nav className="space-y-2">
+            {SIDEBAR_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  link.href === '/admin/bookings'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                }`}
+              >
+                <link.icon className="w-5 h-5" />
+                <span>{link.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="lg:ml-64">
+        {/* Top Bar */}
+        <div className="bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
+              <Menu className="w-5 h-5" />
+            </button>
+            <h1 className="text-xl font-bold">Bookings Management</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 hover:bg-gray-100 rounded-lg">
+              <Bell className="w-5 h-5" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center">{stats.pending}</span>
+            </button>
+          </div>
+        </div>
+
+        <main className="p-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <p className="text-sm text-gray-500">Total</p>
+              <p className="text-2xl font-bold">{stats.total}</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <p className="text-sm text-gray-500">Pending</p>
+              <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <p className="text-sm text-gray-500">Confirmed</p>
+              <p className="text-2xl font-bold text-green-600">{stats.confirmed}</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <p className="text-sm text-gray-500">Completed</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.completed}</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <p className="text-sm text-gray-500">Cancelled</p>
+              <p className="text-2xl font-bold text-red-600">{stats.cancelled}</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <p className="text-sm text-gray-500">Revenue</p>
+              <p className="text-2xl font-bold">${stats.revenue}</p>
+            </div>
+          </div>
+
+          {/* Filters & Actions */}
+          <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search bookings..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex gap-2">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+                <button
+                  onClick={handleExport}
+                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 transition-all"
+                >
+                  <Download className="w-4 h-4" />
+                  Export
+                </button>
+              </div>
+            </div>
+
+            {/* Bulk Actions */}
+            {selectedBookings.length > 0 && (
+              <div className="mt-4 pt-4 border-t flex items-center gap-4">
+                <span className="text-sm text-gray-600">{selectedBookings.length} selected</span>
+                <button onClick={() => handleBulkAction('confirm')} className="text-sm text-green-600 hover:underline">
+                  Confirm Selected
+                </button>
+                <button onClick={() => handleBulkAction('cancel')} className="text-sm text-red-600 hover:underline">
+                  Cancel Selected
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Bookings Table */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-sm text-gray-500 border-b bg-gray-50">
+                    <th className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="rounded"
+                      />
+                    </th>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('id')}>
+                      <div className="flex items-center gap-1">
+                        ID {sortBy === 'id' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
+                      </div>
+                    </th>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('customer')}>
+                      <div className="flex items-center gap-1">
+                        Customer {sortBy === 'customer' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
+                      </div>
+                    </th>
+                    <th className="px-4 py-4 font-medium">Service</th>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('date')}>
+                      <div className="flex items-center gap-1">
+                        Date/Time {sortBy === 'date' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
+                      </div>
+                    </th>
+                    <th className="px-4 py-4 font-medium">Suburb</th>
+                    <th className="px-4 py-4 font-medium">Cleaner</th>
+                    <th className="px-4 py-4 font-medium">Amount</th>
+                    <th className="px-4 py-4 font-medium">Status</th>
+                    <th className="px-4 py-4 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBookings.map((booking) => (
+                    <tr key={booking.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedBookings.includes(booking.id)}
+                          onChange={() => handleSelect(booking.id)}
+                          className="rounded"
+                        />
+                      </td>
+                      <td className="px-4 py-4 font-medium">{booking.id}</td>
+                      <td className="px-4 py-4">
+                        <div>
+                          <p className="font-medium">{booking.customer}</p>
+                          <p className="text-sm text-gray-500">{booking.email}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">{booking.service}</td>
+                      <td className="px-4 py-4">
+                        <p>{booking.date}</p>
+                        <p className="text-sm text-gray-500">{booking.time}</p>
+                      </td>
+                      <td className="px-4 py-4">{booking.suburb}</td>
+                      <td className="px-4 py-4">
+                        {booking.cleaner ? (
+                          <span className="text-sm">{booking.cleaner}</span>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setBookingToAssign(booking.id);
+                              setShowAssignModal(true);
+                            }}
+                            className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200"
+                          >
+                            Assign
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 font-semibold">${booking.amount}</td>
+                      <td className="px-4 py-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[booking.status]}`}>
+                          {booking.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-1">
+                          <button className="p-1 hover:bg-gray-100 rounded" title="View">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button className="p-1 hover:bg-gray-100 rounded" title="Edit">
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button className="p-1 hover:bg-red-100 rounded text-red-500" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {filteredBookings.length === 0 && (
+              <div className="p-8 text-center text-gray-500">
+                <Filter className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <p>No bookings found matching your criteria</p>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+
+      {/* Assign Cleaner Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold mb-4">Assign Cleaner</h3>
+            <p className="text-sm text-gray-600 mb-4">Booking: {bookingToAssign}</p>
+            <select
+              value={selectedCleaner}
+              onChange={(e) => setSelectedCleaner(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select a cleaner</option>
+              {CLEANERS.map((cleaner) => (
+                <option key={cleaner} value={cleaner}>{cleaner}</option>
+              ))}
+            </select>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowAssignModal(false)}
+                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAssignCleaner}
+                disabled={!selectedCleaner}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Assign
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  );
+}

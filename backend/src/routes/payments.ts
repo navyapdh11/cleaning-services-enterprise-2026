@@ -40,13 +40,14 @@ router.post('/create-intent', authenticate,
   }
 );
 
-router.post('/webhook', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/webhook', async (req: any, res: Response, next: NextFunction) => {
   try {
     if (!stripe || !env.STRIPE_WEBHOOK_SECRET) return res.status(400).send('Webhook not configured');
     const sig = req.headers['stripe-signature'] as string;
     let event: Stripe.Event;
+    // req.body is raw Buffer from bodyParser.raw()
     try { event = stripe.webhooks.constructEvent(req.body, sig, env.STRIPE_WEBHOOK_SECRET); }
-    catch (err) { return res.status(400).send(`Webhook Error: ${err.message}`); }
+    catch (err: any) { return res.status(400).send(`Webhook Error: ${err.message}`); }
 
     if (event.type === 'payment_intent.succeeded') {
       const pi = event.data.object as Stripe.PaymentIntent;

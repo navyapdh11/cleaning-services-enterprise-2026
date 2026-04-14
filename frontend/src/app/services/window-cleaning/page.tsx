@@ -1,0 +1,251 @@
+'use client';
+
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { motion } from 'framer-motion';
+import { PanelsTopLeft, Clock, DollarSign, CheckCircle, Star, Shield, ArrowRight, Image as ImageIcon, ChevronDown, ChevronUp, Droplets, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
+const features = [
+  { icon: Droplets, title: 'Streak-Free Finish', description: 'Professional-grade squeegees and pure water systems deliver crystal-clear, streak-free windows every time.' },
+  { icon: Shield, title: 'Safe Access Equipment', description: 'We use harnesses, water-fed poles, and certified scaffolding for safe cleaning of windows at any height.' },
+  { icon: Clock, title: 'Quick Turnaround', description: 'Most residential jobs completed in 1-3 hours. Commercial buildings scheduled to minimise disruption.' },
+  { icon: Sparkles, title: 'Interior & Exterior', description: 'Both sides of every window, including tracks, sills, flyscreens, and frames cleaned thoroughly.' },
+];
+
+const pricingPlans = [
+  { name: 'Apartment / Unit', price: '$89', duration: '1-2 hours', features: ['Up to 10 windows', 'Interior & exterior cleaning', 'Tracks & sills wiped', 'Flyscreens cleaned', 'Streak-free guarantee'] },
+  { name: 'House (Standard)', price: '$149', duration: '2-3 hours', features: ['Up to 20 windows', 'Interior & exterior cleaning', 'Tracks & sills wiped', 'Flyscreens cleaned', 'Door glass included', 'Gutter downpipe wipe'] },
+  { name: 'Large Property', price: '$249', duration: '3+ hours', features: ['20+ windows', 'Everything in Standard plan', 'Skylight cleaning', 'Glass balustrades', 'Conservatory glass', 'High-reach access included'] },
+];
+
+const faqs = [
+  { q: 'Do you clean windows on upper levels?', a: 'Yes. We use water-fed pole systems that reach up to 4 stories from the ground, and for higher levels we use certified rope-access technicians or scaffolding. All work is fully insured.' },
+  { q: 'What happens if it rains on the scheduled day?', a: 'We monitor weather forecasts closely. If rain is expected, we will contact you to reschedule at no charge. Light drizzle may not affect exterior cleaning, but we will always prioritise quality results.' },
+  { q: 'Do you clean flyscreens and tracks too?', a: 'Yes, all our window cleaning packages include cleaning of flyscreens (washed and dried), window tracks (vacuumed and wiped), and sills. These areas collect significant dirt and affect window operation.' },
+  { q: 'How often should windows be professionally cleaned?', a: 'We recommend every 3-6 months for residential properties to maintain clarity and prevent buildup of hard water stains, pollution, and salt deposits. Commercial properties may benefit from monthly or fortnightly service.' },
+];
+
+const testimonials = [
+  { name: 'Tom H.', location: 'Melbourne VIC', text: 'The difference is incredible. I did not realise how dirty our windows were until CleanPro cleaned them. Like having no glass at all.', rating: 5 },
+  { name: 'Natalie S.', location: 'Brisbane QLD', text: 'They cleaned 25 windows including some very hard-to-reach skylights in under 3 hours. Professional and efficient.', rating: 5 },
+  { name: 'Rob M.', location: 'Gold Coast QLD', text: 'Living near the beach, salt buildup on windows was a constant issue. CleanPro solved it and the windows look brand new.', rating: 5 },
+];
+
+const galleryItems = [
+  { label: 'Exterior Before' },
+  { label: 'Exterior After' },
+  { label: 'Interior Before' },
+  { label: 'Interior After' },
+  { label: 'Tracks Before' },
+  { label: 'Tracks After' },
+];
+
+export default function WindowCleaningPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  return (
+    <div className="min-h-screen">
+      <Header />
+
+      {/* Hero */}
+      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-accent-700 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-[url(/grid.svg)] opacity-10" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 relative z-10">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                <PanelsTopLeft className="w-8 h-8" />
+              </div>
+              <span className="text-primary-200 text-sm font-semibold uppercase tracking-wider">Window Cleaning</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              Crystal Clear<br />Windows, Every Time
+            </h1>
+            <p className="text-xl md:text-2xl text-primary-100 mb-8 max-w-2xl">
+              Professional interior and exterior window cleaning with a streak-free guarantee. Starting from $89.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/book?service=window-cleaning" className="btn bg-white text-primary-700 hover:bg-primary-50 text-lg px-8 py-3">
+                Book Now <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+              <a href="#pricing" className="btn border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-3">
+                View Pricing
+              </a>
+            </div>
+            <div className="flex flex-wrap gap-6 mt-8 text-primary-200 text-sm">
+              <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> 1-3 hours</span>
+              <span className="flex items-center gap-2"><DollarSign className="w-4 h-4" /> From $89</span>
+              <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Streak-free guarantee</span>
+            </div>
+          </motion.div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-neutral-50" />
+      </section>
+
+      {/* Features */}
+      <section className="py-20 bg-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Professional Window Cleaning?</h2>
+            <p className="text-neutral-600 text-lg max-w-2xl mx-auto">Clean windows transform your home, let in more natural light, and extend the life of your glass by removing corrosive buildup.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="card hover:shadow-lg transition-all duration-300">
+                <feature.icon className="w-12 h-12 text-primary-600 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <p className="text-neutral-600">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What's Included */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">What We Clean</h2>
+            <p className="text-neutral-600 text-lg">Every component of your window system, thoroughly cleaned</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { room: 'Glass Surfaces', items: ['Interior glass washed', 'Exterior glass washed', 'Stubborn spot removal', 'Hard water stain treatment', 'Streak-free squeegee finish', 'Glass door panels'] },
+              { room: 'Frames & Tracks', items: ['Window frames wiped', 'Tracks vacuumed & washed', 'Sills cleaned & dried', 'Drain holes cleared', 'Handle & lock mechanisms', 'Weather seals inspected'] },
+              { room: 'Screens & Extras', items: ['Flyscreen mesh washed', 'Screen frames cleaned', 'Blinds dusted (if accessible)', 'Skylight glass cleaned', 'Glass balustrades polished', 'Spider webs removed'] },
+            ].map((room, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="card">
+                <h3 className="text-xl font-semibold mb-4 text-primary-600">{room.room}</h3>
+                <ul className="space-y-3">
+                  {room.items.map((item, j) => (
+                    <li key={j} className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-neutral-700">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="py-20 bg-gradient-to-br from-primary-50 to-accent-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Clear Pricing</h2>
+            <p className="text-neutral-600 text-lg">Pricing based on the number of windows. No surprises.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {pricingPlans.map((plan, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className={`card ${i === 1 ? 'border-primary-400 ring-2 ring-primary-200' : 'hover:shadow-lg'} transition-all`}>
+                {i === 1 && <span className="inline-block bg-primary-600 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">Most Popular</span>}
+                <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-4xl font-bold text-primary-600">{plan.price}</span>
+                </div>
+                <p className="text-neutral-500 text-sm mb-6 flex items-center gap-1"><Clock className="w-4 h-4" /> {plan.duration}</p>
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((f, j) => (
+                    <li key={j} className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-neutral-700 text-sm">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/book?service=window-cleaning" className="btn-primary w-full text-center">
+                  Book Now
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Before/After Gallery */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">See the Difference</h2>
+            <p className="text-neutral-600 text-lg">The clarity speaks for itself</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {galleryItems.map((item, i) => (
+              <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="card flex flex-col items-center justify-center min-h-[200px] bg-neutral-100">
+                <ImageIcon className="w-12 h-12 text-neutral-400 mb-3" />
+                <span className="text-neutral-500 font-medium">{item.label}</span>
+                <span className="text-neutral-400 text-sm mt-1">Gallery image placeholder</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Customers Say</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((t, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="card hover:shadow-lg transition-all">
+                <div className="flex gap-1 mb-4">
+                  {Array(t.rating).fill(0).map((_, j) => <Star key={j} className="w-5 h-5 text-yellow-400 fill-yellow-400" />)}
+                </div>
+                <p className="text-neutral-700 mb-4">&ldquo;{t.text}&rdquo;</p>
+                <p className="font-semibold">{t.name}</p>
+                <p className="text-neutral-500 text-sm">{t.location}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+          </div>
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="card">
+                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="flex items-center justify-between w-full text-left">
+                  <span className="text-lg font-semibold pr-4">{faq.q}</span>
+                  {openFaq === i ? <ChevronUp className="w-5 h-5 text-primary-600 shrink-0" /> : <ChevronDown className="w-5 h-5 text-neutral-400 shrink-0" />}
+                </button>
+                {openFaq === i && (
+                  <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-neutral-600 mt-4 leading-relaxed">
+                    {faq.a}
+                  </motion.p>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Booking CTA */}
+      <section className="py-20 bg-neutral-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Let the Light Back In</h2>
+          <p className="text-xl text-neutral-300 mb-8">Book professional window cleaning and enjoy crystal-clear views again.</p>
+          <Link href="/book?service=window-cleaning" className="btn bg-primary-600 hover:bg-primary-700 text-lg px-10 py-4 inline-flex">
+            Book Window Cleaning <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+          <div className="flex flex-wrap gap-6 justify-center mt-8 text-neutral-400">
+            <span className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Interior & exterior</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Streak-free guarantee</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> All heights covered</span>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}

@@ -3,7 +3,7 @@ import { body, query, validationResult } from 'express-validator';
 import { prisma } from '../config/database';
 import { AppError } from '../utils/appError';
 import { successResponse, paginatedResponse } from '../utils/apiResponse';
-import { AuthRequest, authenticate } from '../middleware/auth';
+import { AuthRequest, authenticate, authorize } from '../middleware/auth';
 import { paginate, calculateEndTime } from '../utils/helpers';
 import { BookingStatus, ServiceType } from '@prisma/client';
 
@@ -16,7 +16,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
     const status = req.query.status as BookingStatus | undefined;
     const { skip, take } = paginate(page, limit);
 
-    const where: any = { customerId: req.user!.id };
+    const where: Record<string, any> = { customerId: req.user!.id };
     if (status) where.status = status;
 
     const [bookings, total] = await Promise.all([
@@ -37,6 +37,12 @@ router.post('/', authenticate,
       const { serviceId, date, address, notes, staffId } = req.body;
       const service = await prisma.service.findUnique({ where: { id: serviceId } });
       if (!service || !service.isActive) throw new AppError(404, 'Service unavailable');
+
+      // Validate staff if provided
+      if (staffId) {
+        const staff = await prisma.staff.findUnique({ where: { id: staffId } });
+        if (!staff || !staff.isActive) throw new AppError(400, 'Selected staff unavailable');
+      }
 
       const startTime = new Date(date);
       const endTime = calculateEndTime(startTime, service.duration);
@@ -91,14 +97,14 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
   } catch (error) { next(error); }
 });
 
-// Admin routes
-router.get('/admin/all', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+// Admin routes - require ADMIN or MANAGER role
+router.get('/admin/all', authenticate, authorize('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const status = req.query.status as BookingStatus | undefined;
     const { skip, take } = paginate(page, limit);
-    const where: any = {};
+    const where: Record<string, any> = {};
     if (status) where.status = status;
     const [bookings, total] = await Promise.all([
       prisma.booking.findMany({ where, skip, take, include: { customer: true, service: true, staff: { include: { user: true } } }, orderBy: { date: 'desc' } }),
@@ -108,16 +114,22 @@ router.get('/admin/all', authenticate, async (req: AuthRequest, res: Response, n
   } catch (error) { next(error); }
 });
 
-router.put('/admin/:id/assign', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const { staffId } = req.body;
-    const booking = await prisma.booking.update({
-      where: { id: req.params.id },
-      data: { staffId, status: 'CONFIRMED' },
-      include: { staff: { include: { user: true } } },
-    });
-    return successResponse(res, booking, 'Staff assigned');
-  } catch (error) { next(error); }
-});
+router.put('/admin/:id/assign', authenticate, authorize('ADMIN', 'MANAGER'),
+  [body('staffId').isUUID()],
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) throw new AppError(400, 'Validation failed');
+      
+      const { staffId } = req.body;
+      const booking = await prisma.booking.update({
+        where: { id: req.params.id },
+        data: { staffId, status: 'CONFIRMED' },
+        include: { staff: { include: { user: true } } },
+      });
+      return successResponse(res, booking, 'Staff assigned');
+    } catch (error) { next(error); }
+  }
+);
 
 export default router;

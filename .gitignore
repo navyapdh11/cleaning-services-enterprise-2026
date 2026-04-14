@@ -31,3 +31,27 @@ grafana_data/
 prometheus_data/
 postgres_data/
 redis_data/
+
+# OS specific
+thumbs.db
+desktop.ini
+
+# Debug files
+*.debug
+*.trace
+
+# Package manager locks (keep only one)
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Vercel
+.vercel
+
+# Testing
+.nyc_output
+
+# Backup files
+*.bak
+*.backup
+*.old

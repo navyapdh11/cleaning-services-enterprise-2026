@@ -19,19 +19,19 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Services</h4>
             <ul className="space-y-2 text-neutral-400">
-              <li><Link href="/services/residential" className="hover:text-white">Residential</Link></li>
-              <li><Link href="/services/commercial" className="hover:text-white">Commercial</Link></li>
-              <li><Link href="/services/deep-clean" className="hover:text-white">Deep Clean</Link></li>
-              <li><Link href="/services/move-in-out" className="hover:text-white">Move In/Out</Link></li>
+              <li><Link href="/services/regular-cleaning" className="hover:text-white">Regular Cleaning</Link></li>
+              <li><Link href="/services/commercial-cleaning" className="hover:text-white">Commercial Cleaning</Link></li>
+              <li><Link href="/services/end-of-lease" className="hover:text-white">End of Lease</Link></li>
+              <li><Link href="/services/deep-cleaning" className="hover:text-white">Deep Cleaning</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-2 text-neutral-400">
               <li><Link href="/about" className="hover:text-white">About Us</Link></li>
-              <li><Link href="/careers" className="hover:text-white">Careers</Link></li>
-              <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
-              <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+              <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
+              <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
+              <li><Link href="/services" className="hover:text-white">All Services</Link></li>
             </ul>
           </div>
           <div>

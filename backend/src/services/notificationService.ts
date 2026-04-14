@@ -1,6 +1,6 @@
 import { prisma } from '../config/database';
 import { emailService } from './emailService';
-import logger from '../middleware/logger';
+import { logger } from '../utils/logger';
 import { NotificationType } from '@prisma/client';
 
 class NotificationService {
@@ -20,9 +20,16 @@ class NotificationService {
     const notification = await this.createNotification(userId, title, message, type, data);
     if (!notification) return false;
 
+    // Fetch user's email for EMAIL type notifications
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+
     switch (type) {
       case 'EMAIL':
-        return emailService.sendEmail(userId, 'notification', { title, message });
+        if (!user) {
+          logger.error(`User ${userId} not found for email notification`);
+          return false;
+        }
+        return emailService.sendEmail(user.email, 'notification_custom', { title, message, email: user.email });
       case 'SMS':
         logger.info(`SMS notification to ${userId}: ${message}`);
         return true;

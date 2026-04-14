@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
+import bodyParser from 'body-parser';
 import { env } from './config/env';
 import { apiLimiter } from './middleware/rateLimiter';
 import { errorHandler } from './middleware/errorHandler';
@@ -32,7 +33,11 @@ app.use(morgan('combined', { stream: { write: (message) => logger.info(message.t
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1/bookings', bookingRoutes);
+
+// Stripe webhook needs raw body for signature verification
+app.use('/api/v1/payments/webhook', bodyParser.raw({ type: 'application/json' }));
 app.use('/api/v1/payments', paymentRoutes);
+
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/menu', menuRoutes);

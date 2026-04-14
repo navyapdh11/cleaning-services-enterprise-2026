@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import { env } from './env';
+import { logger } from '../utils/logger';
 
 const globalForRedis = globalThis as unknown as { redis: Redis | null };
 
@@ -12,8 +13,8 @@ export const redis = globalForRedis.redis || new Redis(env.REDIS_URL, {
   lazyConnect: true,
 });
 
-redis.on('error', (err) => console.error('Redis connection error:', err));
-redis.on('connect', () => console.log('Redis connected successfully'));
+redis.on('error', (err) => logger.error('Redis connection error:', err));
+redis.on('connect', () => logger.info('Redis connected successfully'));
 
 if (process.env.NODE_ENV !== 'production') globalForRedis.redis = redis;
 
