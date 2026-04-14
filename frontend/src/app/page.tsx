@@ -14,12 +14,18 @@ const features = [
 ];
 
 const services = [
-  { name: 'Residential Cleaning', price: 'From $99', desc: 'Regular home cleaning tailored to your needs' },
-  { name: 'Deep Cleaning', price: 'From $199', desc: 'Intensive cleaning for hard-to-reach areas' },
-  { name: 'Commercial Cleaning', price: 'From $149', desc: 'Professional office and retail space cleaning' },
-  { name: 'Move In/Out', price: 'From $179', desc: 'Thorough cleaning for transitions' },
-  { name: 'Carpet Cleaning', price: 'From $89', desc: 'Deep extraction for fresh, clean carpets' },
-  { name: 'Window Cleaning', price: 'From $69', desc: 'Crystal clear windows inside and out' },
+  { name: 'Regular Cleaning', slug: 'regular-cleaning', price: 'From $120', desc: 'Standard cleaning service for homes and apartments' },
+  { name: 'Deep Cleaning', slug: 'end-of-lease', price: 'From $250', desc: 'Intensive cleaning for a thorough fresh start' },
+  { name: 'Commercial Cleaning', slug: 'commercial-cleaning', price: 'From $200', desc: 'Professional cleaning for offices and commercial spaces' },
+  { name: 'End of Lease Cleaning', slug: 'end-of-lease', price: 'From $350', desc: 'Bond-back guaranteed cleaning for tenants' },
+  { name: 'Carpet Cleaning', slug: 'carpet-cleaning', price: 'From $150', desc: 'Professional steam carpet cleaning' },
+  { name: 'Window Cleaning', slug: 'window-cleaning', price: 'From $100', desc: 'Interior and exterior window cleaning' },
+  { name: 'Pressure Washing', slug: 'pressure-washing', price: 'From $200', desc: 'Outdoor surface cleaning and restoration' },
+  { name: 'Tile & Grout Cleaning', slug: 'tile-grout-cleaning', price: 'From $180', desc: 'Deep cleaning for tile and grout restoration' },
+  { name: 'Machine Scrubbing', slug: 'machine-scrubbing', price: 'From $160', desc: 'Industrial floor scrubbing and cleaning' },
+  { name: 'Polishing', slug: 'polishing', price: 'From $140', desc: 'Floor and surface polishing services' },
+  { name: 'Sealing', slug: 'sealing', price: 'From $150', desc: 'Protective sealing for various surfaces' },
+  { name: 'Custom Cleaning', slug: 'custom-cleaning', price: 'Custom Quote', desc: 'Tailored cleaning solutions for unique needs' },
 ];
 
 export default function HomePage() {
@@ -80,13 +86,15 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, i) => (
-              <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} className="card hover:border-primary-300 transition-all duration-300 cursor-pointer group">
-                <h3 className="text-xl font-semibold mb-2 group-hover:text-primary-600 transition-colors">{service.name}</h3>
-                <p className="text-neutral-600 mb-4">{service.desc}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-primary-600 font-bold">{service.price}</span>
-                  <Link href="/register" className="btn-primary text-sm">Book Now</Link>
-                </div>
+              <motion.div key={service.slug} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} className="card hover:border-primary-300 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                <Link href={`/services/${service.slug}`} className="block">
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary-600 transition-colors">{service.name}</h3>
+                  <p className="text-neutral-600 mb-4">{service.desc}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-primary-600 font-bold">{service.price}</span>
+                    <span className="btn-primary text-sm group-hover:bg-primary-700 transition-colors">Learn More</span>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
