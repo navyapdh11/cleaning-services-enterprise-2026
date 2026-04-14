@@ -18,6 +18,7 @@ interface MenuItem {
 
 export function DynamicMenu() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuError, setMenuError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuthStore();
 
@@ -26,8 +27,11 @@ export function DynamicMenu() {
       try {
         const { data } = await menuApi.getMenu();
         setMenuItems(data.data || []);
-      } catch (error) {
-        console.error('Failed to fetch menu:', error);
+        setMenuError(null);
+      } catch (error: any) {
+        const message = error.response?.data?.error?.message || error.message || 'Failed to load menu';
+        console.error('[DynamicMenu] Failed to fetch menu:', message, error);
+        setMenuError(message);
       }
     };
     fetchMenu();
@@ -48,7 +52,9 @@ export function DynamicMenu() {
             exit={{ opacity: 0, y: -10 }}
             className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50"
           >
-            {menuItems.length > 0 ? (
+            {menuError ? (
+              <div className="px-4 py-2 text-red-600 text-sm">Failed to load menu</div>
+            ) : menuItems.length > 0 ? (
               menuItems.map((item) => <MenuItem key={item.key} item={item} onClose={() => setIsOpen(false)} />)
             ) : (
               <div className="px-4 py-2 text-neutral-500">No menu items</div>

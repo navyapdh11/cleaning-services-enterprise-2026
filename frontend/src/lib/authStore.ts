@@ -67,7 +67,11 @@ export const useAuthStore = create<AuthState>()(
         try {
           const { data } = await authApi.profile();
           set({ user: data.data });
-        } catch {}
+        } catch (err: any) {
+          const message = err.response?.data?.error?.message || err.message || 'Failed to fetch profile';
+          console.error('[authStore] fetchProfile failed:', message, err);
+          throw err;
+        }
       },
     }),
     { name: 'auth-storage', partialize: (state) => ({ user: state.user, accessToken: state.accessToken, refreshToken: state.refreshToken, isAuthenticated: state.isAuthenticated }) }

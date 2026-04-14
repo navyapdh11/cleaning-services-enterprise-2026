@@ -14,12 +14,56 @@ const COLORS = ['#0ea5e9', '#d946ef', '#10b981', '#f59e0b', '#ef4444'];
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const [data, setData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    dashboardApi.getOverview().then(({ data }) => setData(data.data)).catch(console.error);
+    dashboardApi.getOverview()
+      .then(({ data }) => {
+        setData(data.data);
+        setError(null);
+      })
+      .catch((err: any) => {
+        const message = err.response?.data?.error?.message || err.message || 'Failed to load dashboard data';
+        console.error('[Dashboard] Failed to load overview:', message, err);
+        setError(message);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!data) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse text-neutral-400">Loading...</div></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse text-neutral-400">Loading dashboard...</div></div>;
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="card text-center max-w-md mx-auto">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-600 text-2xl font-bold">!</span>
+          </div>
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Failed to Load Dashboard</h2>
+          <p className="text-neutral-600 mb-6">{error}</p>
+          <button
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              dashboardApi.getOverview()
+                .then(({ data }) => { setData(data.data); setError(null); })
+                .catch((err: any) => {
+                  const message = err.response?.data?.error?.message || err.message || 'Failed to load dashboard data';
+                  setError(message);
+                })
+                .finally(() => setLoading(false));
+            }}
+            className="btn-primary"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse text-neutral-400">No data available.</div></div>;
 
   const { overview, bookingsByStatus, servicesByPopularity, recentReviews } = data;
 

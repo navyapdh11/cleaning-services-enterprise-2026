@@ -10,18 +10,22 @@ import toast from 'react-hot-toast';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const login = useAuthStore((s) => s.login);
   const isLoading = useAuthStore((s) => s.isLoading);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       await login(email, password);
       toast.success('Welcome back!');
       router.push('/dashboard');
     } catch (err: any) {
-      toast.error(err.response?.data?.error?.message || 'Login failed');
+      const message = err.response?.data?.error?.message || err.message || 'Login failed. Please check your credentials and try again.';
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -36,6 +40,11 @@ export default function LoginPage() {
           <p className="text-neutral-600 mt-2">Sign in to your CleanPro account</p>
         </div>
         <form onSubmit={handleSubmit} className="card space-y-6">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm" role="alert">
+              {error}
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium mb-2">Email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="you@example.com" required />
