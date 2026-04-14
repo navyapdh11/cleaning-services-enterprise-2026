@@ -1,4 +1,5 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
@@ -11,6 +12,46 @@ export const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Handle API errors globally with toast notifications
+    if (error.response) {
+      const { status, data } = error.response;
+      const message = data?.error?.message || data?.message || 'An unexpected error occurred';
+
+      switch (status) {
+        case 400:
+          toast.error(message, { id: 'error-400' });
+          break;
+        case 401:
+          // Only show toast if not already retrying
+          if (!error.config._retry) {
+            toast.error('Please log in to continue', { id: 'error-401' });
+          }
+          break;
+        case 403:
+          toast.error('You do not have permission to perform this action', { id: 'error-403' });
+          break;
+        case 404:
+          toast.error('Resource not found', { id: 'error-404' });
+          break;
+        case 409:
+          toast.error(message, { id: 'error-409' });
+          break;
+        case 429:
+          toast.error('Too many requests. Please try again later', { id: 'error-429' });
+          break;
+        case 500:
+          toast.error('Server error. Please try again later', { id: 'error-500' });
+          break;
+        default:
+          toast.error(message, { id: `error-${status}` });
+      }
+    } else if (error.request) {
+      toast.error('Network error. Please check your connection', { id: 'network-error' });
+    } else {
+      toast.error('An unexpected error occurred', { id: 'unknown-error' });
+    }
+
+    // Handle 401 retry logic
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -20,9 +61,13 @@ api.interceptors.response.use(
         // Cookie was refreshed, retry original request
         return api(originalRequest);
       } catch {
-        window.location.href = '/login';
+        // If refresh fails, redirect to login
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
       }
     }
+
     return Promise.reject(error);
   }
 );
@@ -43,6 +88,8 @@ export const servicesApi = {
 
 export const bookingsApi = {
   getAll: (params?: any) => api.get('/bookings', { params }),
+  adminAll: (params?: any) => api.get('/bookings/admin/all', { params }),
+  assignStaff: (id: string, data: { staffId: string }) => api.put(`/bookings/admin/${id}/assign`, data),
   create: (data: any) => api.post('/bookings', data),
   getById: (id: string) => api.get(`/bookings/${id}`),
   cancel: (id: string) => api.put(`/bookings/${id}/cancel`),
