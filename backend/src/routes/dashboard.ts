@@ -10,7 +10,11 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [totalUsers, totalBookings, totalRevenue, activeBookings, monthlyBookings, monthlyRevenue, bookingsByStatus, servicesByPopularity, recentReviews] = await Promise.all([
+    const [
+      totalUsers, totalBookings, totalRevenue, activeBookings,
+      monthlyBookings, monthlyRevenue, bookingsByStatus,
+      servicesByPopularity, recentReviews,
+    ] = await Promise.all([
       prisma.user.count({ where: { isActive: true } }),
       prisma.booking.count(),
       prisma.payment.aggregate({ where: { status: 'COMPLETED' }, _sum: { amount: true } }),
@@ -19,7 +23,15 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
       prisma.payment.aggregate({ where: { status: 'COMPLETED', createdAt: { gte: monthStart } }, _sum: { amount: true } }),
       prisma.booking.groupBy({ by: ['status'], _count: { status: true } }),
       prisma.booking.groupBy({ by: ['serviceId'], _count: { serviceId: true }, orderBy: { _count: { serviceId: 'desc' } }, take: 5 }),
-      prisma.review.findMany({ where: { isPublished: true }, orderBy: { createdAt: 'desc' }, take: 5, include: { customer: { select: { firstName: true, lastName: true } }, booking: { include: { service: { select: { name: true } } } } }),
+      prisma.review.findMany({
+        where: { isPublished: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: {
+          customer: { select: { firstName: true, lastName: true } },
+          booking: { include: { service: { select: { name: true } } } },
+        },
+      }),
     ]);
 
     return successResponse(res, {

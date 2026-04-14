@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, ServiceType } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -78,7 +78,7 @@ async function main() {
       name: 'Regular Cleaning',
       slug: 'regular-cleaning',
       description: 'Standard cleaning service for homes and apartments',
-      type: 'RESIDENTIAL',
+      type: 'RESIDENTIAL' as ServiceType,
       duration: 120,
       basePrice: 120,
       features: ['Kitchen cleaning', 'Bathroom sanitization', 'Vacuuming', 'Dusting', 'Mopping'],
@@ -87,7 +87,7 @@ async function main() {
       name: 'Deep Cleaning',
       slug: 'deep-cleaning',
       description: 'Intensive cleaning for a thorough fresh start',
-      type: 'DEEP_CLEAN',
+      type: 'DEEP_CLEAN' as ServiceType,
       duration: 240,
       basePrice: 250,
       features: ['Everything in Regular', 'Inside appliances', 'Baseboards', 'Light fixtures', 'Window sills'],
@@ -96,7 +96,7 @@ async function main() {
       name: 'End of Lease Cleaning',
       slug: 'end-of-lease',
       description: 'Bond-back guaranteed cleaning for tenants',
-      type: 'RESIDENTIAL',
+      type: 'RESIDENTIAL' as ServiceType,
       duration: 300,
       basePrice: 350,
       features: ['Complete property clean', 'Bond-back guarantee', 'Carpet cleaning', 'Window cleaning'],
@@ -105,7 +105,7 @@ async function main() {
       name: 'Commercial Cleaning',
       slug: 'commercial-cleaning',
       description: 'Professional cleaning for offices and commercial spaces',
-      type: 'COMMERCIAL',
+      type: 'COMMERCIAL' as ServiceType,
       duration: 180,
       basePrice: 200,
       features: ['Office cleaning', 'Restroom sanitization', 'Kitchen/break room', 'Trash removal'],
@@ -114,7 +114,7 @@ async function main() {
       name: 'Carpet Cleaning',
       slug: 'carpet-cleaning',
       description: 'Professional steam carpet cleaning',
-      type: 'CARPET',
+      type: 'CARPET' as ServiceType,
       duration: 90,
       basePrice: 150,
       features: ['Steam cleaning', 'Stain removal', 'Deodorizing', 'Quick drying'],
@@ -123,7 +123,7 @@ async function main() {
       name: 'Window Cleaning',
       slug: 'window-cleaning',
       description: 'Interior and exterior window cleaning',
-      type: 'WINDOW',
+      type: 'WINDOW' as ServiceType,
       duration: 60,
       basePrice: 100,
       features: ['Interior windows', 'Exterior windows', 'Screens', 'Sills and tracks'],
