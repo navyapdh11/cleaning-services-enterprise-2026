@@ -10,18 +10,22 @@ import { AuthRequest, authenticate } from '../middleware/auth';
 import { authLimiter } from '../middleware/rateLimiter';
 import { logger } from '../utils/logger';
 
-const generateTokens = (user: { id: string; email: string; role: string }) => {
+const generateTokens = (user: { id: string; email: string; role: string }, refreshTokenVersion: number = 0) => {
   const accessToken = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN }
   );
   const refreshToken = jwt.sign(
-    { id: user.id },
+    { id: user.id, version: refreshTokenVersion },
     env.JWT_REFRESH_SECRET,
     { expiresIn: env.JWT_REFRESH_EXPIRES_IN }
   );
   return { accessToken, refreshToken };
+};
+
+const getPasswordResetSecret = (): string => {
+  return (env as any).PASSWORD_RESET_SECRET || env.JWT_SECRET;
 };
 
 export const register = [
@@ -67,7 +71,7 @@ export const register = [
         },
       });
 
-      const { accessToken, refreshToken } = generateTokens(user);
+      const { accessToken, refreshToken } = generateTokens(user, 0);
 
       res.status(201);
       return successResponse(res, { user, accessToken, refreshToken }, 'Registration successful');
@@ -91,18 +95,52 @@ export const login = [
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) throw new AppError(401, 'Invalid credentials');
 
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) throw new AppError(401, 'Invalid credentials');
-
       if (!user.isActive) throw new AppError(403, 'Account deactivated');
 
-      await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+      // Check if account is currently locked out
+      if (user.lockoutUntil && user.lockoutUntil > new Date()) {
+        const remainingMs = user.lockoutUntil.getTime() - Date.now();
+        const remainingMin = Math.ceil(remainingMs / 60000);
+        throw new AppError(429, `Account locked. Try again in ${remainingMin} minute(s)`, 'ACCOUNT_LOCKED');
+      }
 
-      const { accessToken, refreshToken } = generateTokens({
-        id: user.id,
-        email: user.email,
-        role: user.role,
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        // Increment failed login attempts
+        const newFailedAttempts = user.failedLoginAttempts + 1;
+        const updateData: { failedLoginAttempts: number; lockoutUntil?: Date } = {
+          failedLoginAttempts: newFailedAttempts,
+        };
+
+        // Lock account after 5 failed attempts for 15 minutes
+        if (newFailedAttempts >= 5) {
+          updateData.lockoutUntil = new Date(Date.now() + 15 * 60 * 1000);
+          throw new AppError(429, 'Account locked due to too many failed attempts. Try again in 15 minutes', 'ACCOUNT_LOCKED');
+        }
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: updateData,
+        });
+
+        const remaining = 5 - newFailedAttempts;
+        throw new AppError(401, `Invalid credentials. ${remaining} attempt(s) remaining`);
+      }
+
+      // Successful login: reset failed attempts and lockout
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          lastLoginAt: new Date(),
+          failedLoginAttempts: 0,
+          lockoutUntil: null,
+        },
       });
+
+      const { accessToken, refreshToken } = generateTokens(
+        { id: user.id, email: user.email, role: user.role },
+        user.refreshTokenVersion
+      );
 
       return successResponse(res, {
         user: {
@@ -125,18 +163,45 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     const { refreshToken } = req.body;
     if (!refreshToken) throw new AppError(401, 'Refresh token required');
 
-    const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as { id: string };
+    const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as { id: string; version: number };
 
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
     if (!user || !user.isActive) throw new AppError(401, 'Invalid refresh token');
 
-    const tokens = generateTokens({ id: user.id, email: user.email, role: user.role });
+    // Token rotation: verify the old token's version matches
+    if (user.refreshTokenVersion !== decoded.version) {
+      // Possible token replay attack: invalidate all tokens
+      logger.warn(`Potential token replay detected for user ${user.id}`);
+      throw new AppError(401, 'Invalid refresh token');
+    }
+
+    // Rotate: increment version to invalidate old token, generate new token
+    const newVersion = user.refreshTokenVersion + 1;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshTokenVersion: newVersion },
+    });
+
+    const tokens = generateTokens(
+      { id: user.id, email: user.email, role: user.role },
+      newVersion
+    );
     return successResponse(res, tokens, 'Token refreshed');
   } catch (error) { next(error); }
 };
 
 export const logout = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    if (req.user?.id) {
+      // Invalidate all existing refresh tokens by incrementing the version
+      await prisma.user.update({
+        where: { id: req.user.id },
+        data: {
+          lastLogoutAt: new Date(),
+          refreshTokenVersion: { increment: 1 },
+        },
+      });
+    }
     return successResponse(res, null, 'Logged out successfully');
   } catch (error) { next(error); }
 };
@@ -177,8 +242,12 @@ export const forgotPassword = [
         return successResponse(res, null, 'If the email exists, a reset link has been sent');
       }
 
-      // Generate password reset token
-      const resetToken = jwt.sign({ id: user.id, type: 'password-reset' }, env.JWT_SECRET, { expiresIn: '1h' });
+      // Generate password reset token with a separate secret
+      const resetToken = jwt.sign(
+        { id: user.id, type: 'password-reset' },
+        getPasswordResetSecret(),
+        { expiresIn: '1h' }
+      );
       const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
       // Send reset email
@@ -200,7 +269,7 @@ export const resetPassword = [
       if (!errors.isEmpty()) throw new AppError(400, 'Validation failed', 'VALIDATION_ERROR');
 
       const { token, password } = req.body;
-      const decoded = jwt.verify(token, env.JWT_SECRET) as { id: string; type: string };
+      const decoded = jwt.verify(token, getPasswordResetSecret()) as { id: string; type: string };
 
       if (decoded.type !== 'password-reset') {
         throw new AppError(400, 'Invalid reset token');
@@ -223,7 +292,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
     const { token } = req.query;
     if (!token) throw new AppError(400, 'Verification token required');
 
-    const decoded = jwt.verify(token as string, env.JWT_SECRET) as { id: string; type: string };
+    const decoded = jwt.verify(token as string, getPasswordResetSecret()) as { id: string; type: string };
     if (decoded.type !== 'email-verification') {
       throw new AppError(400, 'Invalid verification token');
     }

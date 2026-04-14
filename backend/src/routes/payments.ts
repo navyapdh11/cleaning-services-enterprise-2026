@@ -8,6 +8,7 @@ import { successResponse, paginatedResponse } from '../utils/apiResponse';
 import { AuthRequest, authenticate } from '../middleware/auth';
 import { paginate } from '../utils/helpers';
 import { PaymentStatus } from '@prisma/client';
+import { logger } from '../utils/logger';
 
 const router = Router();
 const stripe = env.STRIPE_SECRET_KEY ? new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' }) : null;
@@ -47,19 +48,83 @@ router.post('/webhook', async (req: any, res: Response, next: NextFunction) => {
     let event: Stripe.Event;
     // req.body is raw Buffer from bodyParser.raw()
     try { event = stripe.webhooks.constructEvent(req.body, sig, env.STRIPE_WEBHOOK_SECRET); }
-    catch (err: any) { return res.status(400).send(`Webhook Error: ${err.message}`); }
+    catch (err: any) { 
+      logger.error(`Stripe webhook signature verification failed: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`); 
+    }
+
+    logger.info(`Processing Stripe webhook event: ${event.type} (ID: ${event.id})`);
+
+    // Idempotency: Check if event was already processed
+    const existingEvent = await prisma.payment.findFirst({
+      where: { stripePaymentId: event.id },
+      select: { id: true },
+    });
+
+    if (existingEvent) {
+      logger.warn(`Duplicate webhook event ignored: ${event.id}`);
+      return res.json({ received: true, duplicate: true });
+    }
 
     if (event.type === 'payment_intent.succeeded') {
       const pi = event.data.object as Stripe.PaymentIntent;
-      await prisma.payment.updateMany({ where: { stripePaymentId: pi.id }, data: { status: 'COMPLETED', paidAt: new Date() } });
-      await prisma.booking.updateMany({ where: { id: pi.metadata?.bookingId }, data: { status: 'CONFIRMED' } });
+      const bookingId = pi.metadata?.bookingId;
+
+      if (!bookingId) {
+        logger.error('Webhook payment_intent.succeeded missing bookingId metadata');
+        return res.status(400).send('Missing bookingId');
+      }
+
+      // Verify payment amount matches booking amount
+      const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        select: { totalPrice: true, status: true },
+      });
+
+      if (!booking) {
+        logger.error(`Booking ${bookingId} not found for webhook event`);
+        return res.status(404).send('Booking not found');
+      }
+
+      // Verify amount (Stripe amount is in cents)
+      const expectedAmount = Math.round(booking.totalPrice * 100);
+      if (pi.amount !== expectedAmount) {
+        logger.error(`Amount mismatch for booking ${bookingId}: expected ${expectedAmount}, got ${pi.amount}`);
+        return res.status(400).send('Amount mismatch');
+      }
+
+      // Only update if not already confirmed (idempotency guard)
+      if (booking.status !== 'CONFIRMED' && booking.status !== 'COMPLETED') {
+        await prisma.$transaction([
+          prisma.payment.updateMany({
+            where: { stripePaymentId: pi.id },
+            data: { status: 'COMPLETED', paidAt: new Date() },
+          }),
+          prisma.booking.update({
+            where: { id: bookingId },
+            data: { status: 'CONFIRMED' },
+          }),
+        ]);
+        logger.info(`Booking ${bookingId} confirmed via webhook`);
+      } else {
+        logger.info(`Booking ${bookingId} already in status ${booking.status}, skipping update`);
+      }
     }
+
     if (event.type === 'payment_intent.payment_failed') {
       const pi = event.data.object as Stripe.PaymentIntent;
-      await prisma.payment.updateMany({ where: { stripePaymentId: pi.id }, data: { status: 'FAILED' } });
+      await prisma.payment.updateMany({
+        where: { stripePaymentId: pi.id },
+        data: { status: 'FAILED' },
+      });
+      logger.warn(`Payment failed for intent: ${pi.id}`);
     }
+
     res.json({ received: true });
-  } catch (error) { next(error); }
+  } catch (error) {
+    logger.error(`Webhook processing error: ${error}`);
+    next(error);
+  }
 });
 
 router.get('/history', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
