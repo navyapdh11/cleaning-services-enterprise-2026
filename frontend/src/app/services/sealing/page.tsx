@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'George M.', location: 'Perth WA', text: 'Our travertine pool area was staining constantly. After sealing, water just beads right off. No more stains at all.', rating: 5 },
-  { name: 'Diana K.', location: 'Adelaide SA', text: 'The anti-slip sealer on our bathroom tiles has made such a difference for our elderly parents. Safer and still looks great.', rating: 5 },
-  { name: 'Chris P.', location: 'Sydney NSW', text: 'Had our entire driveway sealed and it looks fantastic. The colour enhancement brought out the natural beauty of the concrete.', rating: 5 },
+  { name: 'George M.', location: 'Perth WA', text: 'Travertine pool area was staining all the time. After sealing, water just beads off.', rating: 5 },
+  { name: 'Diana K.', location: 'Adelaide SA', text: 'Anti-slip sealer on bathroom tiles helps our elderly parents. Safer and still looks good.', rating: 5 },
+  { name: 'Chris P.', location: 'Sydney NSW', text: 'Driveway sealed and it looks good. The colour enhancement brought out the concrete nicely.', rating: 5 },
 ];
 
 const galleryItems = [

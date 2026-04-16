@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Maria G.', location: 'Sydney NSW', text: 'My bathroom tiles look like they just got installed. The grout went from dark grey back to white. Absolutely incredible work.', rating: 5 },
-  { name: 'Peter W.', location: 'Melbourne VIC', text: 'The kitchen floor tiles have not looked this good since we moved in 8 years ago. The grout cleaning made such a huge difference.', rating: 5 },
-  { name: 'Jenny K.', location: 'Brisbane QLD', text: 'We had mould in the bathroom grout that we could not shift. CleanPro removed it all and the colour sealing made it look brand new.', rating: 5 },
+  { name: 'Maria G.', location: 'Sydney NSW', text: 'Bathroom grout went from dark grey back to white. Looks like it was just done.', rating: 5 },
+  { name: 'Peter W.', location: 'Melbourne VIC', text: 'Kitchen floor tiles have not looked this good in 8 years. The grout cleaning made the difference.', rating: 5 },
+  { name: 'Jenny K.', location: 'Brisbane QLD', text: 'Mould in the bathroom grout is gone. The colour sealing made it look new.', rating: 5 },
 ];
 
 const galleryItems = [

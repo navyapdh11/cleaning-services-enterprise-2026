@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Christine L.', location: 'Sydney NSW', text: 'My carpets look brand new. The pet odour is completely gone and they dried in just 3 hours. Amazing service.', rating: 5 },
-  { name: 'Paul D.', location: 'Melbourne VIC', text: 'Had a red wine stain I thought was permanent. CleanPro removed it completely. The steam cleaning process was impressive to watch.', rating: 5 },
-  { name: 'Rebecca F.', location: 'Adelaide SA', text: 'As an allergy sufferer, the difference in air quality after carpet cleaning is remarkable. Sleeping so much better.', rating: 5 },
+  { name: 'Christine L.', location: 'Sydney NSW', text: 'The pet odour is gone and carpets dried in about 3 hours. Good result.', rating: 5 },
+  { name: 'Paul D.', location: 'Melbourne VIC', text: 'They got out a red wine stain I thought was permanent. Happy with that.', rating: 5 },
+  { name: 'Rebecca F.', location: 'Adelaide SA', text: 'The air quality feels better after the carpet clean. My allergies have settled.', rating: 5 },
 ];
 
 const galleryItems = [

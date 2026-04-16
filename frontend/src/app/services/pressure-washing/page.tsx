@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Steve M.', location: 'Brisbane QLD', text: 'My 15-year-old concrete driveway looks brand new. Neighbours thought I had it replaced. Incredible transformation for the price.', rating: 5 },
-  { name: 'Helen C.', location: 'Melbourne VIC', text: 'CleanPro pressure washed our deck, fence, and driveway in one visit. The whole property looks freshly renovated.', rating: 5 },
-  { name: 'Andrew T.', location: 'Perth WA', text: 'The mould on our north-facing walls is completely gone. They used a soft wash technique that was safe for the render.', rating: 5 },
+  { name: 'Steve M.', location: 'Brisbane QLD', text: 'My 15-year-old driveway looks new. Neighbours thought I had it replaced. Good price for the result.', rating: 5 },
+  { name: 'Helen C.', location: 'Melbourne VIC', text: 'Deck, fence, and driveway done in one visit. The whole place looks fresh.', rating: 5 },
+  { name: 'Andrew T.', location: 'Perth WA', text: 'Mould on our north walls is gone. The soft wash was safe for the render.', rating: 5 },
 ];
 
 const galleryItems = [

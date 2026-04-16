@@ -75,9 +75,9 @@ const TESTIMONIALS: Record<string, { name: string; rating: number; text: string;
 };
 
 const DEFAULT_TESTIMONIALS = [
-  { name: 'Sarah P.', rating: 5, text: 'Excellent service, highly recommend!', date: '1 week ago' },
-  { name: 'Tom H.', rating: 5, text: 'Professional and punctual. Will use again.', date: '2 weeks ago' },
-  { name: 'Jane M.', rating: 4, text: 'Great value for money, very satisfied.', date: '1 month ago' },
+  { name: 'Sarah P.', rating: 5, text: 'Good service, reliable work.', date: '1 week ago' },
+  { name: 'Tom H.', rating: 5, text: 'They were on time and did a thorough job.', date: '2 weeks ago' },
+  { name: 'Jane M.', rating: 4, text: 'Fair price for the work done.', date: '1 month ago' },
 ];
 
 function formatSuburbName(slug: string): string {

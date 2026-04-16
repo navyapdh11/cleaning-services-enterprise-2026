@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Frank D.', location: 'Warehouse Manager, Sydney', text: 'Our warehouse floor had 10 years of oil buildup. CleanPro machine scrubbed it and it looks like a new floor. Outstanding work.', rating: 5 },
-  { name: 'Sarah J.', location: 'Cafe Owner, Melbourne', text: 'The kitchen floor was so greasy it was a slip hazard. After one machine scrub it was safe and clean again. Highly recommend.', rating: 5 },
-  { name: 'Mike T.', location: 'Homeowner, Perth', text: 'Had our garage floor machine scrubbed and it looks incredible. The machine really gets into the concrete pores that nothing else can reach.', rating: 5 },
+  { name: 'Frank D.', location: 'Warehouse Manager, Sydney', text: 'Our warehouse floor had 10 years of oil buildup. CleanPro scrubbed it and it looks like a new floor.', rating: 5 },
+  { name: 'Sarah J.', location: 'Cafe Owner, Melbourne', text: 'Kitchen floor was a slip hazard from grease. One scrub and it was safe again.', rating: 5 },
+  { name: 'Mike T.', location: 'Homeowner, Perth', text: 'Garage floor scrubbed clean. The machine gets into the concrete pores nothing else reaches.', rating: 5 },
 ];
 
 const galleryItems = [

@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Rachel N.', location: 'Melbourne VIC', text: 'Our marble foyer looks absolutely stunning. The polish brought back a shine I forgot it ever had. Worth every cent.', rating: 5 },
-  { name: 'Tony B.', location: 'Sydney NSW', text: 'The concrete floors in our showroom now look like glass. Clients always comment on them. CleanPro did an amazing job.', rating: 5 },
-  { name: 'Linda W.', location: 'Brisbane QLD', text: 'Had our terrazzo floors polished and they look better than when the house was built. The shine is incredible.', rating: 5 },
+  { name: 'Rachel N.', location: 'Melbourne VIC', text: 'Marble foyer looks great. The polish brought back a shine I forgot was there.', rating: 5 },
+  { name: 'Tony B.', location: 'Sydney NSW', text: 'Concrete showroom floors now look like glass. Clients always comment on them.', rating: 5 },
+  { name: 'Linda W.', location: 'Brisbane QLD', text: 'Terrazzo floors look better than when the house was built. Good shine.', rating: 5 },
 ];
 
 const galleryItems = [

@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Vanessa R.', location: 'Melbourne VIC', text: 'I needed a post-renovation clean that was not your standard service. CleanPro created a custom plan and the result was perfect. Every surface was dust-free.', rating: 5 },
-  { name: 'James H.', location: 'Sydney NSW', text: 'Booked a custom clean before a big family gathering. They handled everything from the windows to the outdoor entertaining area. Guests were impressed.', rating: 5 },
-  { name: 'Tina L.', location: 'Brisbane QLD', text: 'I love that I can pick and choose exactly what I want cleaned. No paying for tasks I do not need. The custom approach is brilliant.', rating: 5 },
+  { name: 'Vanessa R.', location: 'Melbourne VIC', text: 'Needed a post-renovation clean that was not a standard service. CleanPro put together a plan and every surface was dust-free.', rating: 5 },
+  { name: 'James H.', location: 'Sydney NSW', text: 'Booked before a family gathering. They handled windows to the outdoor area. Guests noticed.', rating: 5 },
+  { name: 'Tina L.', location: 'Brisbane QLD', text: 'I pick and choose what I want cleaned. No paying for tasks I do not need. Works well for me.', rating: 5 },
 ];
 
 const galleryItems = [

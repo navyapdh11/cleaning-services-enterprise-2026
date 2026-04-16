@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Tom H.', location: 'Melbourne VIC', text: 'The difference is incredible. I did not realise how dirty our windows were until CleanPro cleaned them. Like having no glass at all.', rating: 5 },
-  { name: 'Natalie S.', location: 'Brisbane QLD', text: 'They cleaned 25 windows including some very hard-to-reach skylights in under 3 hours. Professional and efficient.', rating: 5 },
-  { name: 'Rob M.', location: 'Gold Coast QLD', text: 'Living near the beach, salt buildup on windows was a constant issue. CleanPro solved it and the windows look brand new.', rating: 5 },
+  { name: 'Tom H.', location: 'Melbourne VIC', text: 'I did not realise how dirty the windows were. They look like there is no glass at all now.', rating: 5 },
+  { name: 'Natalie S.', location: 'Brisbane QLD', text: '25 windows including hard-to-reach skylights done in under 3 hours. Quick work.', rating: 5 },
+  { name: 'Rob M.', location: 'Gold Coast QLD', text: 'Salt buildup from the beach was a constant problem. CleanPro sorted it out.', rating: 5 },
 ];
 
 const galleryItems = [

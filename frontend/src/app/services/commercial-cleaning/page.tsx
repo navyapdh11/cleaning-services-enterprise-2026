@@ -8,10 +8,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 const features = [
-  { icon: Shield, title: 'Fully Insured', description: 'Our commercial team carries full liability insurance, protecting your business during every cleaning session.' },
-  { icon: Users, title: 'Dedicated Account Manager', description: 'A single point of contact manages your account, coordinates schedules, and handles any requests.' },
-  { icon: Clock, title: 'After-Hours Available', description: 'Clean outside business hours so your team is never disrupted. Evening and weekend slots available.' },
-  { icon: FileText, title: 'Compliance Documentation', description: 'We provide cleaning logs, safety data sheets, and compliance reports for audit requirements.' },
+  { icon: Shield, title: 'Fully Insured', description: 'Full liability insurance on every job.' },
+  { icon: Users, title: 'Single Point of Contact', description: 'One account manager handles your schedule and requests.' },
+  { icon: Clock, title: 'After-Hours Available', description: 'Clean outside business hours. Evening and weekend slots.' },
+  { icon: FileText, title: 'Compliance Documentation', description: 'Cleaning logs, safety sheets, and compliance reports for audits.' },
 ];
 
 const pricingPlans = [
@@ -28,9 +28,9 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: 'Karen B.', location: 'Facility Manager, Melbourne', text: 'CleanPro handles our 3-floor office building flawlessly. The after-hours team is professional and we never have complaints from staff.', rating: 5 },
-  { name: 'Dr. James P.', location: 'Medical Centre, Sydney', text: 'They understand the hygiene standards required in a medical environment. Impeccable work every time.', rating: 5 },
-  { name: 'Lisa T.', location: 'Retail Store Manager, Perth', text: 'Our store looks pristine every morning thanks to CleanPro. The evening crew is thorough and respectful of our merchandise.', rating: 5 },
+  { name: 'Karen B.', location: 'Facility Manager, Melbourne', text: 'CleanPro handles our 3-floor office. The after-hours team is professional and staff never complain.', rating: 5 },
+  { name: 'Dr. James P.', location: 'Medical Centre, Sydney', text: 'They know the hygiene standards a medical environment needs. Good work every time.', rating: 5 },
+  { name: 'Lisa T.', location: 'Retail Store Manager, Perth', text: 'Our store looks good every morning. The evening crew is thorough and careful with our stock.', rating: 5 },
 ];
 
 const galleryItems = [
