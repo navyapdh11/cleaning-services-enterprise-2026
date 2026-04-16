@@ -5,13 +5,13 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.test' });
 
 // Mock external services before tests
-jest.mock('./services/emailService', () => ({
+jest.mock('../services/emailService', () => ({
   emailService: {
     sendEmail: jest.fn().mockResolvedValue({ messageId: 'test-message-id' }),
   },
 }));
 
-jest.mock('./config/redis', () => ({
+jest.mock('../config/redis', () => ({
   redisClient: {
     connect: jest.fn().mockResolvedValue(undefined),
     quit: jest.fn().mockResolvedValue(undefined),

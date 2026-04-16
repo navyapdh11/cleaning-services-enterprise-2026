@@ -35,7 +35,7 @@ describe('Services API', () => {
         password: adminHash,
         firstName: adminUser.firstName,
         lastName: adminUser.lastName,
-        role: adminUser.role,
+        role: 'ADMIN' as const,
       },
     });
 
@@ -56,15 +56,15 @@ describe('Services API', () => {
       email: adminUser.email,
       password: adminUser.password,
     });
-    const adminCookies = adminRes.headers['set-cookie'];
-    adminToken = adminCookies.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
+    const adminCookies = adminRes.headers['set-cookie'] as unknown as string[] | undefined;
+    adminToken = adminCookies!.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
 
     const customerRes = await request(app).post('/api/v1/auth/login').send({
       email: customerUser.email,
       password: customerUser.password,
     });
-    const customerCookies = customerRes.headers['set-cookie'];
-    customerToken = customerCookies.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
+    const customerCookies = customerRes.headers['set-cookie'] as unknown as string[] | undefined;
+    customerToken = customerCookies!.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
   });
 
   afterAll(async () => {

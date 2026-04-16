@@ -34,10 +34,10 @@ describe('Auth Controller', () => {
       expect(res.body.message).toBe('Registration successful');
 
       // Verify HTTP-only cookies are set
-      const cookies = res.headers['set-cookie'];
+      const cookies = res.headers['set-cookie'] as unknown as string[] | undefined;
       expect(cookies).toBeDefined();
-      expect(cookies.some((c: string) => c.includes('accessToken'))).toBe(true);
-      expect(cookies.some((c: string) => c.includes('refreshToken'))).toBe(true);
+      expect(cookies!.some((c: string) => c.includes('accessToken'))).toBe(true);
+      expect(cookies!.some((c: string) => c.includes('refreshToken'))).toBe(true);
     });
 
     it('should reject registration with invalid email', async () => {
@@ -105,9 +105,9 @@ describe('Auth Controller', () => {
       expect(res.body.message).toBe('Login successful');
 
       // Verify HTTP-only cookies are set
-      const cookies = res.headers['set-cookie'];
-      expect(cookies.some((c: string) => c.includes('accessToken'))).toBe(true);
-      expect(cookies.some((c: string) => c.includes('refreshToken'))).toBe(true);
+      const cookies = res.headers['set-cookie'] as unknown as string[] | undefined;
+      expect(cookies!.some((c: string) => c.includes('accessToken'))).toBe(true);
+      expect(cookies!.some((c: string) => c.includes('refreshToken'))).toBe(true);
     });
 
     it('should reject login with invalid email', async () => {
@@ -173,8 +173,8 @@ describe('Auth Controller', () => {
         password: testUser.password,
       });
 
-      const cookies = res.headers['set-cookie'];
-      accessToken = cookies.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
+      const cookies = res.headers['set-cookie'] as unknown as string[] | undefined;
+      accessToken = cookies!.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
     });
 
     it('should logout successfully', async () => {
@@ -186,9 +186,9 @@ describe('Auth Controller', () => {
       expect(res.body.success).toBe(true);
 
       // Verify cookies are cleared
-      const cookies = res.headers['set-cookie'];
-      expect(cookies.some((c: string) => c.includes('accessToken=;'))).toBe(true);
-      expect(cookies.some((c: string) => c.includes('refreshToken=;'))).toBe(true);
+      const cookies = res.headers['set-cookie'] as unknown as string[] | undefined;
+      expect(cookies!.some((c: string) => c.includes('accessToken=;'))).toBe(true);
+      expect(cookies!.some((c: string) => c.includes('refreshToken=;'))).toBe(true);
     });
   });
 
@@ -201,8 +201,8 @@ describe('Auth Controller', () => {
         password: testUser.password,
       });
 
-      const cookies = res.headers['set-cookie'];
-      accessToken = cookies.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
+      const cookies = res.headers['set-cookie'] as unknown as string[] | undefined;
+      accessToken = cookies!.find((c: string) => c.includes('accessToken')).split(';')[0].split('=')[1];
     });
 
     it('should get user profile with valid token', async () => {
