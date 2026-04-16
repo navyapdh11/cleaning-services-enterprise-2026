@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -20,9 +20,11 @@ import {
   Menu,
   X,
   Bell,
+  Loader2,
 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { useAdminBookings, useAdminStaff, useAssignStaff } from '@/lib/adminApi';
 
 const SIDEBAR_LINKS = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
@@ -31,27 +33,16 @@ const SIDEBAR_LINKS = [
   { icon: UserCheck, label: 'Cleaners', href: '/admin/cleaners' },
 ];
 
-const ALL_BOOKINGS = [
-  { id: 'BK-001', customer: 'Emma Thompson', email: 'emma@email.com', service: 'Deep Cleaning', date: '2026-04-14', time: '09:00', address: '12 Bondi Rd, Bondi', suburb: 'Bondi', status: 'confirmed', amount: 250, cleaner: 'Sarah M.', bedrooms: 3, bathrooms: 2 },
-  { id: 'BK-002', customer: 'James Wilson', email: 'james@email.com', service: 'End of Lease', date: '2026-04-14', time: '10:00', address: '45 Manly St, Manly', suburb: 'Manly', status: 'pending', amount: 350, cleaner: null, bedrooms: 2, bathrooms: 1 },
-  { id: 'BK-003', customer: 'Sarah Chen', email: 'sarah@email.com', service: 'Standard', date: '2026-04-15', time: '08:00', address: '78 George St, Surry Hills', suburb: 'Surry Hills', status: 'confirmed', amount: 120, cleaner: 'Maria L.', bedrooms: 1, bathrooms: 1 },
-  { id: 'BK-004', customer: 'Michael Brown', email: 'michael@email.com', service: 'Office Cleaning', date: '2026-04-15', time: '14:00', address: '100 Pitt St, Sydney', suburb: 'Sydney CBD', status: 'completed', amount: 200, cleaner: 'James K.', bedrooms: 0, bathrooms: 2 },
-  { id: 'BK-005', customer: 'Lisa Anderson', email: 'lisa@email.com', service: 'Carpet Cleaning', date: '2026-04-16', time: '11:00', address: '23 King St, Newtown', suburb: 'Newtown', status: 'confirmed', amount: 150, cleaner: 'Sarah M.', bedrooms: 4, bathrooms: 2 },
-  { id: 'BK-006', customer: 'David Park', email: 'david@email.com', service: 'Window Cleaning', date: '2026-04-16', time: '09:00', address: '56 Oxford St, Paddington', suburb: 'Paddington', status: 'pending', amount: 100, cleaner: null, bedrooms: 2, bathrooms: 1 },
-  { id: 'BK-007', customer: 'Rachel Green', email: 'rachel@email.com', service: 'Deep Cleaning', date: '2026-04-17', time: '10:00', address: '89 Harris St, Pyrmont', suburb: 'Pyrmont', status: 'confirmed', amount: 280, cleaner: 'Maria L.', bedrooms: 3, bathrooms: 2 },
-  { id: 'BK-008', customer: 'Tom Harris', email: 'tom@email.com', service: 'Standard', date: '2026-04-17', time: '13:00', address: '12 Victoria Rd, Drummoyne', suburb: 'Drummoyne', status: 'cancelled', amount: 120, cleaner: null, bedrooms: 2, bathrooms: 1 },
-  { id: 'BK-009', customer: 'Amy White', email: 'amy@email.com', service: 'End of Lease', date: '2026-04-18', time: '08:00', address: '34 Military Rd, Neutral Bay', suburb: 'Neutral Bay', status: 'pending', amount: 350, cleaner: null, bedrooms: 2, bathrooms: 2 },
-  { id: 'BK-010', customer: 'Chris Lee', email: 'chris@email.com', service: 'Pressure Washing', date: '2026-04-18', time: '09:00', address: '67 Pacific Hwy, Chatswood', suburb: 'Chatswood', status: 'confirmed', amount: 200, cleaner: 'James K.', bedrooms: 0, bathrooms: 0 },
-];
-
 const statusColors: Record<string, string> = {
-  confirmed: 'bg-green-100 text-green-700',
-  pending: 'bg-yellow-100 text-yellow-700',
-  completed: 'bg-blue-100 text-blue-700',
-  cancelled: 'bg-red-100 text-red-700',
+  CONFIRMED: 'bg-green-100 text-green-700',
+  PENDING: 'bg-yellow-100 text-yellow-700',
+  COMPLETED: 'bg-blue-100 text-blue-700',
+  CANCELLED: 'bg-red-100 text-red-700',
 };
 
-const CLEANERS = ['Sarah M.', 'James K.', 'Maria L.', 'John D.', 'Anna S.'];
+function toTitleCase(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
 
 export default function AdminBookings() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -64,16 +55,39 @@ export default function AdminBookings() {
   const [bookingToAssign, setBookingToAssign] = useState<string | null>(null);
   const [selectedCleaner, setSelectedCleaner] = useState('');
 
-  const filteredBookings = ALL_BOOKINGS
-    .filter((b) => {
+  const [page, setPage] = useState(1);
+  const limit = 20;
+  const { data: bookingsData, isLoading } = useAdminBookings(page, limit, statusFilter === 'all' ? undefined : statusFilter);
+  const { data: staff } = useAdminStaff();
+  const assignMutation = useAssignStaff();
+
+  const bookings = useMemo(() => {
+    return (bookingsData?.data || []).map((b: any) => ({
+      id: b.id.substring(0, 8).toUpperCase(),
+      customer: `${b.customer?.firstName || ''} ${b.customer?.lastName || ''}`.trim() || 'Unknown',
+      email: b.customer?.email || '',
+      service: b.service?.name || 'Unknown',
+      date: new Date(b.date).toLocaleDateString(),
+      time: new Date(b.startTime || b.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      address: b.address || '',
+      suburb: '',
+      status: (b.status || '').toUpperCase(),
+      amount: Number(b.totalPrice || 0),
+      cleaner: b.staff ? `${b.staff.user?.firstName || ''} ${b.staff.user?.lastName || ''}`.trim() : null,
+    }));
+  }, [bookingsData]);
+
+  const cleanersList = (staff || []).map((s: any) => `${s.user?.firstName || ''} ${s.user?.lastName || ''}`.trim() || 'Staff');
+
+  const filteredBookings = bookings
+    .filter((b: any) => {
       const matchesSearch =
         b.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
         b.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        b.suburb.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || b.status === statusFilter;
-      return matchesSearch && matchesStatus;
+        b.address.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesSearch;
     })
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
       const aVal = a[sortBy as keyof typeof a];
       const bVal = b[sortBy as keyof typeof b];
       if (typeof aVal === 'string' && typeof bVal === 'string') {
@@ -93,7 +107,7 @@ export default function AdminBookings() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedBookings(filteredBookings.map((b) => b.id));
+      setSelectedBookings(filteredBookings.map((b: any) => b.id));
     } else {
       setSelectedBookings([]);
     }
@@ -107,8 +121,17 @@ export default function AdminBookings() {
 
   const handleAssignCleaner = () => {
     if (bookingToAssign && selectedCleaner) {
-      // Update booking with assigned cleaner
-      console.log(`Assigning ${selectedCleaner} to ${bookingToAssign}`);
+      // Find the actual booking ID from the API data
+      const booking = (bookingsData?.data || []).find((b: any) => b.id.substring(0, 8).toUpperCase() === bookingToAssign);
+      if (booking) {
+        // Find staff member by name
+        const staffMember = (staff || []).find((s: any) =>
+          `${s.user?.firstName || ''} ${s.user?.lastName || ''}`.trim() === selectedCleaner
+        );
+        if (staffMember) {
+          assignMutation.mutate({ id: booking.id, staffId: staffMember.id });
+        }
+      }
       setShowAssignModal(false);
       setBookingToAssign(null);
       setSelectedCleaner('');
@@ -123,7 +146,7 @@ export default function AdminBookings() {
   const handleExport = () => {
     const csv = [
       ['ID', 'Customer', 'Service', 'Date', 'Time', 'Status', 'Amount'].join(','),
-      ...filteredBookings.map((b) =>
+      ...filteredBookings.map((b: any) =>
         [b.id, b.customer, b.service, b.date, b.time, b.status, b.amount].join(',')
       ),
     ].join('\n');
@@ -137,13 +160,21 @@ export default function AdminBookings() {
     URL.revokeObjectURL(url);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
   const stats = {
-    total: ALL_BOOKINGS.length,
-    pending: ALL_BOOKINGS.filter((b) => b.status === 'pending').length,
-    confirmed: ALL_BOOKINGS.filter((b) => b.status === 'confirmed').length,
-    completed: ALL_BOOKINGS.filter((b) => b.status === 'completed').length,
-    cancelled: ALL_BOOKINGS.filter((b) => b.status === 'cancelled').length,
-    revenue: ALL_BOOKINGS.filter((b) => b.status !== 'cancelled').reduce((sum, b) => sum + b.amount, 0),
+    total: bookingsData?.total || 0,
+    pending: bookings.filter((b: any) => b.status === 'PENDING').length,
+    confirmed: bookings.filter((b: any) => b.status === 'CONFIRMED').length,
+    completed: bookings.filter((b: any) => b.status === 'COMPLETED').length,
+    cancelled: bookings.filter((b: any) => b.status === 'CANCELLED').length,
+    revenue: bookings.filter((b: any) => b.status !== 'CANCELLED').reduce((sum: number, b: any) => sum + b.amount, 0),
   };
 
   return (
@@ -320,7 +351,7 @@ export default function AdminBookings() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredBookings.map((booking) => (
+                  {filteredBookings.map((booking: any) => (
                     <tr key={booking.id} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-4">
                         <input
@@ -405,7 +436,7 @@ export default function AdminBookings() {
               className="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a cleaner</option>
-              {CLEANERS.map((cleaner) => (
+              {cleanersList.map((cleaner: string) => (
                 <option key={cleaner} value={cleaner}>{cleaner}</option>
               ))}
             </select>
