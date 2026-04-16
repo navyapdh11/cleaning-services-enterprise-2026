@@ -1,10 +1,16 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!API_URL) {
+  console.error('[api] NEXT_PUBLIC_API_URL is not set. API calls will fail.');
+}
+
+const baseURL = API_URL || 'http://localhost:4000/api/v1';
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true, // Send cookies with requests
 });

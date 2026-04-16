@@ -7,7 +7,7 @@ import { env } from '../config/env';
 import { AppError } from '../utils/appError';
 import { successResponse } from '../utils/apiResponse';
 import { AuthRequest, authenticate } from '../middleware/auth';
-import { authLimiter } from '../middleware/rateLimiter';
+import { authLimiter, passwordResetLimiter } from '../middleware/rateLimiter';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -178,16 +178,26 @@ router.get('/profile', authenticate, async (req: AuthRequest, res, next) => {
 });
 
 // PUT /profile
-router.put('/profile', authenticate, async (req: AuthRequest, res, next) => {
-  try {
-    const { firstName, lastName, phone, avatar } = req.body;
-    const user = await prisma.user.update({ where: { id: req.user!.id }, data: { firstName, lastName, phone, avatar }, select: { id: true, email: true, firstName: true, lastName: true, phone: true, avatar: true, role: true } });
-    return successResponse(res, user, 'Profile updated');
-  } catch (error) { next(error); }
-});
+router.put('/profile', authenticate,
+  [
+    body('firstName').optional().trim().isLength({ min: 1, max: 50 }),
+    body('lastName').optional().trim().isLength({ min: 1, max: 50 }),
+    body('phone').optional().trim().matches(/^[\d\s()+-]{6,20}$/),
+    body('avatar').optional().isURL({ protocols: ['https'], require_protocol: true }),
+  ],
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) throw new AppError(400, 'Validation failed', 'VALIDATION_ERROR');
+      const { firstName, lastName, phone, avatar } = req.body;
+      const user = await prisma.user.update({ where: { id: req.user!.id }, data: { firstName, lastName, phone, avatar }, select: { id: true, email: true, firstName: true, lastName: true, phone: true, avatar: true, role: true } });
+      return successResponse(res, user, 'Profile updated');
+    } catch (error) { next(error); }
+  }
+);
 
 // POST /forgot-password
-router.post('/forgot-password', [body('email').isEmail().normalizeEmail()], async (req: Request, res: Response, next: NextFunction) => {
+router.post('/forgot-password', passwordResetLimiter, [body('email').isEmail().normalizeEmail()], async (req: Request, res: Response, next: NextFunction) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) throw new AppError(400, 'Validation failed', 'VALIDATION_ERROR');
@@ -212,8 +222,8 @@ router.post('/reset-password', [body('token').notEmpty(), body('password').isLen
     const decoded = jwt.verify(token, getPasswordResetSecret()) as { id: string; type: string };
     if (decoded.type !== 'password-reset') throw new AppError(400, 'Invalid reset token');
     const hashedPassword = await bcrypt.hash(password, 12);
-    await prisma.user.update({ where: { id: decoded.id }, data: { password: hashedPassword } });
-    logger.info(`Password reset successful for user ${decoded.id}`);
+    await prisma.user.update({ where: { id: decoded.id }, data: { password: hashedPassword, refreshTokenVersion: { increment: 1 } } });
+    logger.info(`Password reset successful for user ${decoded.id} (all sessions invalidated)`);
     return successResponse(res, null, 'Password reset successful');
   } catch (error) { next(error); }
 });

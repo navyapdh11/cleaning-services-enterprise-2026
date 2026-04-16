@@ -65,10 +65,10 @@ export const useAuthStore = create<AuthState>()(
           // Backend reads token from HTTP-only cookie automatically
           const { data } = await authApi.profile();
           set({ user: data.data });
-        } catch (err: any) {
-          const message = err.response?.data?.error?.message || err.message || 'Failed to fetch profile';
-          console.error('[authStore] fetchProfile failed:', message, err);
-          throw err;
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : 'Unknown error';
+          console.error('[authStore] Failed to fetch profile:', message);
+          // Don't throw - allow graceful degradation (user still sees cached data)
         }
       },
     }),

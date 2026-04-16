@@ -40,7 +40,8 @@ router.put('/users/:id',
       const data: Record<string, any> = {};
       if (role !== undefined) data.role = role;
       if (isActive !== undefined) data.isActive = isActive;
-      const user = await prisma.user.update({ where: { id: req.params.id }, data, select: { id: true, email: true, role: true, isActive: true } });
+      const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const user = await prisma.user.update({ where: { id: userId }, data, select: { id: true, email: true, role: true, isActive: true } });
       return successResponse(res, user, 'User updated');
     } catch (error) { next(error); }
   }

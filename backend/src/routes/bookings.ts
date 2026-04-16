@@ -4,6 +4,7 @@ import { prisma } from '../config/database';
 import { AppError } from '../utils/appError';
 import { successResponse, paginatedResponse } from '../utils/apiResponse';
 import { AuthRequest, authenticate, authorize } from '../middleware/auth';
+import { authLimiter, bookingLimiter } from '../middleware/rateLimiter';
 import { paginate, calculateEndTime } from '../utils/helpers';
 import { BookingStatus, ServiceType } from '@prisma/client';
 
@@ -94,7 +95,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
   } catch (error) { next(error); }
 });
 
-router.post('/', authenticate,
+router.post('/', authenticate, bookingLimiter,
   [body('serviceId').isUUID(), body('date').isISO8601(), body('address').trim().isLength({ min: 5 })],
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
@@ -180,20 +181,22 @@ router.post('/', authenticate,
 
 router.put('/:id/cancel', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const booking = await prisma.booking.findFirst({ where: { id: req.params.id, customerId: req.user!.id } });
+    const bookingId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const booking = await prisma.booking.findFirst({ where: { id: bookingId, customerId: req.user!.id } });
     if (!booking) throw new AppError(404, 'Booking not found');
     if (booking.status === BookingStatus.COMPLETED || booking.status === BookingStatus.CANCELLED) {
       throw new AppError(400, 'Cannot cancel this booking');
     }
-    const updated = await prisma.booking.update({ where: { id: req.params.id }, data: { status: 'CANCELLED' } });
+    const updated = await prisma.booking.update({ where: { id: bookingId }, data: { status: 'CANCELLED' } });
     return successResponse(res, updated, 'Booking cancelled');
   } catch (error) { next(error); }
 });
 
 router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    const bookingId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const booking = await prisma.booking.findFirst({
-      where: { id: req.params.id, customerId: req.user!.id },
+      where: { id: bookingId, customerId: req.user!.id },
       include: { service: true, staff: { include: { user: true } }, payment: true, reviews: true },
     });
     if (!booking) throw new AppError(404, 'Booking not found');

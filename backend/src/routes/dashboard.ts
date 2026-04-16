@@ -5,7 +5,8 @@ import { AuthRequest, authenticate, authorize } from '../middleware/auth';
 
 const router = Router();
 
-router.get('/', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+// Dashboard overview - restricted to ADMIN and MANAGER only
+router.get('/', authenticate, authorize('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -28,7 +29,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
         orderBy: { createdAt: 'desc' },
         take: 5,
         include: {
-          customer: { select: { firstName: true, lastName: true } },
+          customer: { include: { user: { select: { firstName: true, lastName: true } } } },
           booking: { include: { service: { select: { name: true } } } },
         },
       }),
@@ -53,7 +54,8 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
   } catch (error) { next(error); }
 });
 
-router.get('/analytics', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+// Analytics - restricted to ADMIN and MANAGER only
+router.get('/analytics', authenticate, authorize('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const days = parseInt(req.query.days as string) || 30;
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);

@@ -54,16 +54,27 @@ router.post('/', authenticate, authorize('ADMIN', 'MANAGER'),
   }
 );
 
-router.put('/:id', authenticate, authorize('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const { name, description, type, duration, basePrice, features, imageUrl, isActive } = req.body;
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const data: Record<string, any> = { description, type, duration, basePrice, features, imageUrl, isActive };
-    if (name) { data.name = name; data.slug = generateSlug(name); }
-    const service = await prisma.service.update({ where: { id }, data });
-    return successResponse(res, service, 'Service updated');
-  } catch (error) { next(error); }
-});
+router.put('/:id', authenticate, authorize('ADMIN', 'MANAGER'),
+  [
+    body('name').optional().trim().isLength({ min: 2, max: 100 }),
+    body('description').optional().trim().isLength({ max: 2000 }),
+    body('basePrice').optional().isFloat({ min: 0 }),
+    body('duration').optional().isInt({ min: 15 }),
+    body('isActive').optional().isBoolean(),
+  ],
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) throw new AppError(400, 'Validation failed');
+      const { name, description, type, duration, basePrice, features, imageUrl, isActive } = req.body;
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const data: Record<string, any> = { description, type, duration, basePrice, features, imageUrl, isActive };
+      if (name) { data.name = name; data.slug = generateSlug(name); }
+      const service = await prisma.service.update({ where: { id }, data });
+      return successResponse(res, service, 'Service updated');
+    } catch (error) { next(error); }
+  }
+);
 
 router.delete('/:id', authenticate, authorize('ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

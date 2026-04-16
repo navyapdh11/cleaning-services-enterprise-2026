@@ -13,6 +13,10 @@ import { logger } from '../utils/logger';
 const router = Router();
 const stripe = env.STRIPE_SECRET_KEY ? new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' }) : null;
 
+// Webhook event deduplication - in-memory cache with TTL
+const processedEvents = new Map<string, number>();
+const EVENT_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
 router.post('/create-intent', authenticate,
   [body('bookingId').isUUID()],
   async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -55,13 +59,14 @@ router.post('/webhook', async (req: any, res: Response, next: NextFunction) => {
 
     logger.info(`Processing Stripe webhook event: ${event.type} (ID: ${event.id})`);
 
-    // Idempotency: Check if event was already processed
-    const existingEvent = await prisma.payment.findFirst({
-      where: { stripePaymentId: event.id },
-      select: { id: true },
-    });
+    // Clean old events from cache
+    const now = Date.now();
+    for (const [eventId, timestamp] of processedEvents) {
+      if (now - timestamp > EVENT_TTL) processedEvents.delete(eventId);
+    }
 
-    if (existingEvent) {
+    // Idempotency: Check if event was already processed (by event ID, not payment intent ID)
+    if (processedEvents.has(event.id)) {
       logger.warn(`Duplicate webhook event ignored: ${event.id}`);
       return res.json({ received: true, duplicate: true });
     }
@@ -121,6 +126,9 @@ router.post('/webhook', async (req: any, res: Response, next: NextFunction) => {
     }
 
     res.json({ received: true });
+
+    // Mark event as processed after successful response
+    processedEvents.set(event.id, Date.now());
   } catch (error) {
     logger.error(`Webhook processing error: ${error}`);
     next(error);
