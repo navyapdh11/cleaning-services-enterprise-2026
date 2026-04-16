@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -25,9 +25,11 @@ import {
   Star,
   Clock,
   DollarSign,
+  Loader2,
 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { useAdminUsers } from '@/lib/adminApi';
 
 const SIDEBAR_LINKS = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
@@ -35,32 +37,6 @@ const SIDEBAR_LINKS = [
   { icon: Users, label: 'CRM', href: '/admin/crm' },
   { icon: UserCheck, label: 'Cleaners', href: '/admin/cleaners' },
 ];
-
-const CUSTOMERS = [
-  { id: 'CUST-001', name: 'Emma Thompson', email: 'emma@email.com', phone: '0412 345 678', address: '12 Bondi Rd, Bondi', suburb: 'Bondi', joinDate: '2025-06-15', totalBookings: 12, totalSpent: 2800, lastBooking: '2026-04-14', rating: 5, notes: 'Prefers eco-friendly products' },
-  { id: 'CUST-002', name: 'James Wilson', email: 'james@email.com', phone: '0423 456 789', address: '45 Manly St, Manly', suburb: 'Manly', joinDate: '2025-08-22', totalBookings: 8, totalSpent: 2400, lastBooking: '2026-04-14', rating: 4, notes: 'End of lease regular' },
-  { id: 'CUST-003', name: 'Sarah Chen', email: 'sarah@email.com', phone: '0434 567 890', address: '78 George St, Surry Hills', suburb: 'Surry Hills', joinDate: '2025-09-10', totalBookings: 15, totalSpent: 1800, lastBooking: '2026-04-15', rating: 5, notes: 'Weekly recurring customer' },
-  { id: 'CUST-004', name: 'Michael Brown', email: 'michael@email.com', phone: '0445 678 901', address: '100 Pitt St, Sydney', suburb: 'Sydney CBD', joinDate: '2025-07-05', totalBookings: 6, totalSpent: 1200, lastBooking: '2026-04-15', rating: 4, notes: 'Office cleaning contract' },
-  { id: 'CUST-005', name: 'Lisa Anderson', email: 'lisa@email.com', phone: '0456 789 012', address: '23 King St, Newtown', suburb: 'Newtown', joinDate: '2025-11-18', totalBookings: 4, totalSpent: 600, lastBooking: '2026-04-16', rating: 5, notes: '' },
-  { id: 'CUST-006', name: 'David Park', email: 'david@email.com', phone: '0467 890 123', address: '56 Oxford St, Paddington', suburb: 'Paddington', joinDate: '2026-01-03', totalBookings: 3, totalSpent: 300, lastBooking: '2026-04-16', rating: 4, notes: '' },
-  { id: 'CUST-007', name: 'Rachel Green', email: 'rachel@email.com', phone: '0478 901 234', address: '89 Harris St, Pyrmont', suburb: 'Pyrmont', joinDate: '2025-10-25', totalBookings: 9, totalSpent: 2520, lastBooking: '2026-04-17', rating: 5, notes: 'VIP customer - priority booking' },
-  { id: 'CUST-008', name: 'Tom Harris', email: 'tom@email.com', phone: '0489 012 345', address: '12 Victoria Rd, Drummoyne', suburb: 'Drummoyne', joinDate: '2025-12-08', totalBookings: 2, totalSpent: 240, lastBooking: '2026-04-17', rating: 3, notes: 'Cancelled last booking' },
-  { id: 'CUST-009', name: 'Amy White', email: 'amy@email.com', phone: '0490 123 456', address: '34 Military Rd, Neutral Bay', suburb: 'Neutral Bay', joinDate: '2026-02-14', totalBookings: 5, totalSpent: 1750, lastBooking: '2026-04-18', rating: 5, notes: 'End of lease cleaning' },
-  { id: 'CUST-010', name: 'Chris Lee', email: 'chris@email.com', phone: '0401 234 567', address: '67 Pacific Hwy, Chatswood', suburb: 'Chatswood', joinDate: '2025-05-20', totalBookings: 20, totalSpent: 4000, lastBooking: '2026-04-18', rating: 5, notes: 'Top customer - monthly contract' },
-];
-
-const BOOKING_HISTORY: Record<string, { date: string; service: string; amount: number; status: string }[]> = {
-  'CUST-001': [
-    { date: '2026-04-14', service: 'Deep Cleaning', amount: 250, status: 'confirmed' },
-    { date: '2026-03-28', service: 'Standard', amount: 120, status: 'completed' },
-    { date: '2026-03-14', service: 'Deep Cleaning', amount: 250, status: 'completed' },
-  ],
-  'CUST-003': [
-    { date: '2026-04-15', service: 'Standard', amount: 120, status: 'confirmed' },
-    { date: '2026-04-08', service: 'Standard', amount: 120, status: 'completed' },
-    { date: '2026-04-01', service: 'Standard', amount: 120, status: 'completed' },
-  ],
-};
 
 const statusColors: Record<string, string> = {
   confirmed: 'bg-green-100 text-green-700',
@@ -77,13 +53,34 @@ export default function AdminCRM() {
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  const filteredCustomers = CUSTOMERS
-    .filter((c) =>
+  const [page] = useState(1);
+  const limit = 50;
+  const { data: usersData, isLoading } = useAdminUsers(page, limit, 'CUSTOMER');
+
+  const customers = useMemo(() => {
+    return (usersData?.data || []).map((u: any) => ({
+      id: u.id.substring(0, 8).toUpperCase(),
+      name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
+      email: u.email || '',
+      phone: u.phone || 'N/A',
+      address: '',
+      suburb: '',
+      joinDate: new Date(u.createdAt).toLocaleDateString(),
+      totalBookings: 0,
+      totalSpent: 0,
+      lastBooking: '',
+      rating: 0,
+      notes: '',
+    }));
+  }, [usersData]);
+
+  const filteredCustomers = customers
+    .filter((c: any) =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.suburb.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
       const aVal = a[sortBy as keyof typeof a];
       const bVal = b[sortBy as keyof typeof b];
       if (typeof aVal === 'string' && typeof bVal === 'string') {
@@ -106,13 +103,21 @@ export default function AdminCRM() {
     setShowDetails(true);
   };
 
-  const selectedCustomerData = CUSTOMERS.find((c) => c.id === selectedCustomer);
-  const customerBookings = selectedCustomer ? BOOKING_HISTORY[selectedCustomer] || [] : [];
+  const selectedCustomerData = customers.find((c: any) => c.id === selectedCustomer);
+  const customerBookings: any[] = []; // Will be populated when booking history API is available
 
-  const totalCustomers = CUSTOMERS.length;
-  const totalRevenue = CUSTOMERS.reduce((sum, c) => sum + c.totalSpent, 0);
-  const avgBookings = (CUSTOMERS.reduce((sum, c) => sum + c.totalBookings, 0) / totalCustomers).toFixed(1);
-  const avgRating = (CUSTOMERS.reduce((sum, c) => sum + c.rating, 0) / totalCustomers).toFixed(1);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  const totalCustomers = usersData?.total || customers.length;
+  const totalRevenue = customers.reduce((sum: number, c: any) => sum + c.totalSpent, 0);
+  const avgBookings = customers.length > 0 ? (customers.reduce((sum: number, c: any) => sum + c.totalBookings, 0) / customers.length).toFixed(1) : '0';
+  const avgRating = customers.length > 0 ? (customers.reduce((sum: number, c: any) => sum + c.rating, 0) / customers.length).toFixed(1) : '0';
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -270,7 +275,7 @@ export default function AdminCRM() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCustomers.map((customer) => (
+                  {filteredCustomers.map((customer: any) => (
                     <tr key={customer.id} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-4 font-medium">{customer.id}</td>
                       <td className="px-4 py-4">

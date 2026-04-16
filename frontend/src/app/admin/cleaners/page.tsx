@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -29,6 +29,7 @@ import {
   Award,
   TrendingUp,
   DollarSign,
+  Loader2,
 } from 'lucide-react';
 import {
   BarChart,
@@ -41,6 +42,7 @@ import {
 } from 'recharts';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { useAdminStaff, useCreateStaff } from '@/lib/adminApi';
 
 const SIDEBAR_LINKS = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
@@ -48,23 +50,6 @@ const SIDEBAR_LINKS = [
   { icon: Users, label: 'CRM', href: '/admin/crm' },
   { icon: UserCheck, label: 'Cleaners', href: '/admin/cleaners' },
 ];
-
-const CLEANERS = [
-  { id: 'CLR-001', name: 'Sarah Mitchell', email: 'sarah.m@cleanpro.com.au', phone: '0412 345 678', suburb: 'Bondi', rating: 4.9, totalJobs: 342, hourlyRate: 35, status: 'active', specialties: ['Deep Cleaning', 'Standard'], joinedDate: '2024-03-15', availability: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], currentBooking: 'BK-001', nextAvailable: '2026-04-15' },
-  { id: 'CLR-002', name: 'James Kim', email: 'james.k@cleanpro.com.au', phone: '0423 456 789', suburb: 'Manly', rating: 4.8, totalJobs: 256, hourlyRate: 32, status: 'active', specialties: ['End of Lease', 'Office'], joinedDate: '2024-06-20', availability: ['Mon', 'Wed', 'Fri', 'Sat'], currentBooking: 'BK-004', nextAvailable: '2026-04-16' },
-  { id: 'CLR-003', name: 'Maria Lopez', email: 'maria.l@cleanpro.com.au', phone: '0434 567 890', suburb: 'Surry Hills', rating: 5.0, totalJobs: 189, hourlyRate: 38, status: 'active', specialties: ['Standard', 'Deep Cleaning'], joinedDate: '2024-08-10', availability: ['Tue', 'Thu', 'Sat', 'Sun'], currentBooking: 'BK-003', nextAvailable: '2026-04-16' },
-  { id: 'CLR-004', name: 'John Davis', email: 'john.d@cleanpro.com.au', phone: '0445 678 901', suburb: 'Newtown', rating: 4.7, totalJobs: 128, hourlyRate: 30, status: 'active', specialties: ['Carpet Cleaning', 'Pressure Washing'], joinedDate: '2025-01-05', availability: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], currentBooking: null, nextAvailable: '2026-04-14' },
-  { id: 'CLR-005', name: 'Anna Smith', email: 'anna.s@cleanpro.com.au', phone: '0456 789 012', suburb: 'Pyrmont', rating: 4.9, totalJobs: 201, hourlyRate: 36, status: 'active', specialties: ['Standard', 'Window Cleaning'], joinedDate: '2024-09-22', availability: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun'], currentBooking: null, nextAvailable: '2026-04-14' },
-  { id: 'CLR-006', name: 'Peter Wong', email: 'peter.w@cleanpro.com.au', phone: '0467 890 123', suburb: 'Chatswood', rating: 4.6, totalJobs: 95, hourlyRate: 28, status: 'on-leave', specialties: ['Office', 'Carpet Cleaning'], joinedDate: '2025-04-18', availability: [], currentBooking: null, nextAvailable: '2026-04-25' },
-  { id: 'CLR-007', name: 'Emma Taylor', email: 'emma.t@cleanpro.com.au', phone: '0478 901 234', suburb: 'Parramatta', rating: 4.8, totalJobs: 167, hourlyRate: 34, status: 'active', specialties: ['Deep Cleaning', 'End of Lease'], joinedDate: '2024-11-30', availability: ['Mon', 'Tue', 'Thu', 'Fri'], currentBooking: null, nextAvailable: '2026-04-14' },
-  { id: 'CLR-008', name: 'David Nguyen', email: 'david.n@cleanpro.com.au', phone: '0489 012 345', suburb: 'Strathfield', rating: 4.5, totalJobs: 78, hourlyRate: 28, status: 'active', specialties: ['Standard', 'Garden Maintenance'], joinedDate: '2025-06-15', availability: ['Mon', 'Wed', 'Fri', 'Sat', 'Sun'], currentBooking: null, nextAvailable: '2026-04-15' },
-];
-
-const performanceData = CLEANERS.slice(0, 6).map((c) => ({
-  name: c.name.split(' ')[0],
-  jobs: c.totalJobs,
-  rating: c.rating * 20,
-}));
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
@@ -82,8 +67,30 @@ export default function AdminCleaners() {
   const [showDetails, setShowDetails] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const filteredCleaners = CLEANERS
-    .filter((c) => {
+  const { data: staffData, isLoading } = useAdminStaff();
+  const createStaffMutation = useCreateStaff();
+
+  const cleaners = useMemo(() => {
+    return (staffData || []).map((s: any) => ({
+      id: s.id.substring(0, 8).toUpperCase(),
+      name: `${s.user?.firstName || ''} ${s.user?.lastName || ''}`.trim() || 'Staff Member',
+      email: s.user?.email || '',
+      phone: s.user?.phone || 'N/A',
+      suburb: '',
+      rating: Number(s.averageRating || 0),
+      totalJobs: Number(s.completedJobs || 0),
+      hourlyRate: Number(s.hourlyRate || 0),
+      status: s.isActive ? 'active' : 'inactive',
+      specialties: s.specialization ? s.specialization.split(',').map((sp: string) => sp.trim()) : [],
+      joinedDate: new Date(s.createdAt).toLocaleDateString(),
+      availability: [],
+      currentBooking: null,
+      nextAvailable: '',
+    }));
+  }, [staffData]);
+
+  const filteredCleaners = cleaners
+    .filter((c: any) => {
       const matchesSearch =
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,7 +98,7 @@ export default function AdminCleaners() {
       const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
       return matchesSearch && matchesStatus;
     })
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
       const aVal = a[sortBy as keyof typeof a];
       const bVal = b[sortBy as keyof typeof b];
       if (typeof aVal === 'string' && typeof bVal === 'string') {
@@ -99,6 +106,20 @@ export default function AdminCleaners() {
       }
       return sortOrder === 'asc' ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
     });
+
+  const performanceData = filteredCleaners.slice(0, 6).map((c: any) => ({
+    name: c.name.split(' ')[0],
+    jobs: c.totalJobs,
+    rating: c.rating * 20,
+  }));
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -114,15 +135,15 @@ export default function AdminCleaners() {
     setShowDetails(true);
   };
 
-  const selectedCleanerData = CLEANERS.find((c) => c.id === selectedCleaner);
+  const selectedCleanerData = cleaners.find((c: any) => c.id === selectedCleaner);
 
   const stats = {
-    total: CLEANERS.length,
-    active: CLEANERS.filter((c) => c.status === 'active').length,
-    onLeave: CLEANERS.filter((c) => c.status === 'on-leave').length,
-    available: CLEANERS.filter((c) => c.status === 'active' && !c.currentBooking).length,
-    avgRating: (CLEANERS.reduce((sum, c) => sum + c.rating, 0) / CLEANERS.length).toFixed(1),
-    totalJobs: CLEANERS.reduce((sum, c) => sum + c.totalJobs, 0),
+    total: cleaners.length,
+    active: cleaners.filter((c: any) => c.status === 'active').length,
+    onLeave: cleaners.filter((c: any) => c.status === 'on-leave').length,
+    available: cleaners.filter((c: any) => c.status === 'active' && !c.currentBooking).length,
+    avgRating: cleaners.length > 0 ? (cleaners.reduce((sum: number, c: any) => sum + c.rating, 0) / cleaners.length).toFixed(1) : '0',
+    totalJobs: cleaners.reduce((sum: number, c: any) => sum + c.totalJobs, 0),
   };
 
   return (
@@ -330,7 +351,7 @@ export default function AdminCleaners() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCleaners.map((cleaner) => (
+                  {filteredCleaners.map((cleaner: any) => (
                     <tr key={cleaner.id} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-4 font-medium">{cleaner.id}</td>
                       <td className="px-4 py-4">
@@ -364,7 +385,7 @@ export default function AdminCleaners() {
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex flex-wrap gap-1">
-                          {cleaner.specialties.map((s) => (
+                          {cleaner.specialties.map((s: string) => (
                             <span key={s} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                               {s}
                             </span>
@@ -430,7 +451,7 @@ export default function AdminCleaners() {
                   </tr>
                 </thead>
                 <tbody>
-                  {CLEANERS.filter((c) => c.status === 'active').map((cleaner) => (
+                  {cleaners.filter((c: any) => c.status === 'active').map((cleaner: any) => (
                     <tr key={cleaner.id} className="border-b">
                       <td className="py-3 px-4 font-medium">{cleaner.name}</td>
                       {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
@@ -515,7 +536,7 @@ export default function AdminCleaners() {
               <div className="mb-6">
                 <h5 className="font-semibold mb-2">Specialties</h5>
                 <div className="flex flex-wrap gap-2">
-                  {selectedCleanerData.specialties.map((s) => (
+                  {selectedCleanerData.specialties.map((s: string) => (
                     <span key={s} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
                       {s}
                     </span>
