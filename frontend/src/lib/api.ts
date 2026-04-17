@@ -1,10 +1,11 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import toast from 'react-hot-toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-if (!API_URL) {
-  console.error('[api] NEXT_PUBLIC_API_URL is not set. API calls will fail.');
+if (!API_URL && process.env.NODE_ENV === 'development') {
+  // eslint-disable-next-line no-console
+  console.warn('[api] NEXT_PUBLIC_API_URL is not set. API calls will fail.');
 }
 
 const baseURL = API_URL || 'http://localhost:4000/api/v1';
@@ -17,7 +18,7 @@ export const api = axios.create({
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  async (error: AxiosError<{ error?: { message?: string }; message?: string }>) => {
     // Handle API errors globally with toast notifications
     if (error.response) {
       const { status, data } = error.response;
@@ -29,7 +30,7 @@ api.interceptors.response.use(
           break;
         case 401:
           // Only show toast if not already retrying
-          if (!error.config._retry) {
+          if (!(error.config as InternalAxiosRequestConfig & { _retry?: boolean })._retry) {
             toast.error('Please log in to continue', { id: 'error-401' });
           }
           break;
@@ -58,7 +59,7 @@ api.interceptors.response.use(
     }
 
     // Handle 401 retry logic
-    const originalRequest = error.config;
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
@@ -79,41 +80,41 @@ api.interceptors.response.use(
 );
 
 export const authApi = {
-  register: (data: any) => api.post('/auth/register', data),
-  login: (data: any) => api.post('/auth/login', data),
-  refresh: (data: any) => api.post('/auth/refresh', data),
+  register: (data: Record<string, unknown>) => api.post('/auth/register', data),
+  login: (data: { email: string; password: string }) => api.post('/auth/login', data),
+  refresh: () => api.post('/auth/refresh'),
   logout: () => api.post('/auth/logout'),
   profile: () => api.get('/auth/profile'),
-  updateProfile: (data: any) => api.put('/auth/profile', data),
+  updateProfile: (data: Record<string, unknown>) => api.put('/auth/profile', data),
 };
 
 export const servicesApi = {
-  getAll: (params?: any) => api.get('/services', { params }),
+  getAll: (params?: Record<string, unknown>) => api.get('/services', { params }),
   getById: (id: string) => api.get(`/services/${id}`),
 };
 
 export const bookingsApi = {
-  getAll: (params?: any) => api.get('/bookings', { params }),
-  adminAll: (params?: any) => api.get('/bookings/admin/all', { params }),
+  getAll: (params?: Record<string, unknown>) => api.get('/bookings', { params }),
+  adminAll: (params?: Record<string, unknown>) => api.get('/bookings/admin/all', { params }),
   adminGetOne: (id: string) => api.get(`/bookings/admin/${id}`),
   assignStaff: (id: string, data: { staffId: string }) => api.put(`/bookings/admin/${id}/assign`, data),
-  adminUpdate: (id: string, data: any) => api.put(`/bookings/admin/${id}`, data),
+  adminUpdate: (id: string, data: Record<string, unknown>) => api.put(`/bookings/admin/${id}`, data),
   adminDelete: (id: string) => api.delete(`/bookings/admin/${id}`),
   bulkConfirm: (bookingIds: string[]) => api.post('/bookings/admin/bulk-confirm', { bookingIds }),
   bulkCancel: (bookingIds: string[]) => api.post('/bookings/admin/bulk-cancel', { bookingIds }),
-  create: (data: any) => api.post('/bookings', data),
+  create: (data: Record<string, unknown>) => api.post('/bookings', data),
   getById: (id: string) => api.get(`/bookings/${id}`),
   cancel: (id: string) => api.put(`/bookings/${id}/cancel`),
 };
 
 export const paymentsApi = {
-  createIntent: (data: any) => api.post('/payments/create-intent', data),
-  history: (params?: any) => api.get('/payments/history', { params }),
+  createIntent: (data: { bookingId: string }) => api.post('/payments/create-intent', data),
+  history: (params?: Record<string, unknown>) => api.get('/payments/history', { params }),
 };
 
 export const reviewsApi = {
-  create: (data: any) => api.post('/reviews', data),
-  getByService: (serviceId: string, params?: any) => api.get(`/reviews/service/${serviceId}`, { params }),
+  create: (data: Record<string, unknown>) => api.post('/reviews', data),
+  getByService: (serviceId: string, params?: Record<string, unknown>) => api.get(`/reviews/service/${serviceId}`, { params }),
 };
 
 export const menuApi = {
@@ -123,18 +124,18 @@ export const menuApi = {
 
 export const dashboardApi = {
   getOverview: () => api.get('/dashboard'),
-  getAnalytics: (params?: any) => api.get('/dashboard/analytics', { params }),
+  getAnalytics: (params?: Record<string, unknown>) => api.get('/dashboard/analytics', { params }),
 };
 
 export const adminApi = {
-  getUsers: (params?: any) => api.get('/admin/users', { params }),
-  getUserBookings: (userId: string, params?: any) => api.get(`/admin/users/${userId}/bookings`, { params }),
-  updateUser: (id: string, data: any) => api.put(`/admin/users/${id}`, data),
+  getUsers: (params?: Record<string, unknown>) => api.get('/admin/users', { params }),
+  getUserBookings: (userId: string, params?: Record<string, unknown>) => api.get(`/admin/users/${userId}/bookings`, { params }),
+  updateUser: (id: string, data: Record<string, unknown>) => api.put(`/admin/users/${id}`, data),
   deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
-  createUser: (data: any) => api.post('/admin/users', data),
+  createUser: (data: Record<string, unknown>) => api.post('/admin/users', data),
   getStaff: () => api.get('/admin/staff'),
-  createStaff: (data: any) => api.post('/admin/staff', data),
-  updateStaff: (id: string, data: any) => api.put(`/admin/staff/${id}`, data),
+  createStaff: (data: Record<string, unknown>) => api.post('/admin/staff', data),
+  updateStaff: (id: string, data: Record<string, unknown>) => api.put(`/admin/staff/${id}`, data),
   deleteStaff: (id: string) => api.delete(`/admin/staff/${id}`),
   getAnalytics: () => api.get('/admin/analytics'),
 };

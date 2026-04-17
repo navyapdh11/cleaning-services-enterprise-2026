@@ -28,9 +28,14 @@ export function DynamicMenu() {
         const { data } = await menuApi.getMenu();
         setMenuItems(data.data || []);
         setMenuError(null);
-      } catch (error: any) {
-        const message = error.response?.data?.error?.message || error.message || 'Failed to load menu';
-        console.error('[DynamicMenu] Failed to fetch menu:', message, error);
+      } catch (error: unknown) {
+        const message = error instanceof Error && 'response' in error
+          ? (error as { response?: { data?: { error?: { message?: string } } } }).response?.data?.error?.message || error.message
+          : 'Failed to load menu';
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('[DynamicMenu] Menu fetch failed:', message);
+        }
         setMenuError(message);
       }
     };

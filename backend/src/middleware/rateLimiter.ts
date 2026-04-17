@@ -41,3 +41,12 @@ export const passwordResetLimiter = rateLimit({
   max: 5,
   message: { success: false, error: { message: 'Too many password reset attempts, please try again later.' } },
 });
+
+// Admin routes limiter - prevents abuse of admin endpoints
+export const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  message: { success: false, error: { message: 'Too many admin requests, please try again later.' } },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

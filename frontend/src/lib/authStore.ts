@@ -16,7 +16,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  register: (data: Record<string, unknown>) => Promise<void>;
   logout: () => Promise<void>;
   setUser: (user: User) => void;
   fetchProfile: () => Promise<void>;
@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: false });
         }
       },
-      register: async (data: any) => {
+      register: async (data: Record<string, unknown>) => {
         set({ isLoading: true });
         try {
           // Backend sets HTTP-only cookies automatically on register
@@ -51,7 +51,9 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       logout: async () => {
-        try { await authApi.logout(); } catch {}
+        try { await authApi.logout(); } catch {
+          // Silently handle logout failures - user is still cleared locally
+        }
         // Backend clears HTTP-only cookies automatically on logout
         set({ user: null, isAuthenticated: false });
       },
@@ -62,8 +64,12 @@ export const useAuthStore = create<AuthState>()(
           const { data } = await authApi.profile();
           set({ user: data.data });
         } catch (err: unknown) {
-          const message = err instanceof Error ? err.message : 'Unknown error';
-          console.error('[authStore] Failed to fetch profile:', message);
+          // Only log in development - in production, silently degrade
+          if (process.env.NODE_ENV === 'development') {
+            const message = err instanceof Error ? err.message : 'Unknown error';
+            // eslint-disable-next-line no-console
+            console.error('[authStore] Profile fetch failed:', message);
+          }
           // Don't throw - allow graceful degradation (user still sees cached data)
         }
       },

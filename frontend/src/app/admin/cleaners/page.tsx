@@ -40,6 +40,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { CHART_COLORS_STATUS } from '@/lib/chartColors';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAdminStaff, useCreateStaff, useUpdateStaff, useDeleteStaff } from '@/lib/adminApi';
@@ -122,7 +123,7 @@ export default function AdminCleaners() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
@@ -235,7 +236,7 @@ export default function AdminCleaners() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-neutral-100">
       <Header />
 
       {/* Mobile sidebar overlay */}
@@ -245,7 +246,7 @@ export default function AdminCleaners() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-neutral-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -264,7 +265,7 @@ export default function AdminCleaners() {
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                   link.href === '/admin/cleaners'
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
                 }`}
               >
                 <link.icon className="w-5 h-5" />
@@ -286,7 +287,7 @@ export default function AdminCleaners() {
             <h1 className="text-xl font-bold">Cleaner Management</h1>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg">
+            <button className="relative p-2 hover:bg-neutral-100 rounded-lg">
               <Bell className="w-5 h-5" />
             </button>
           </div>
@@ -299,7 +300,7 @@ export default function AdminCleaners() {
               <div className="flex items-center gap-3">
                 <UserCheck className="w-8 h-8 text-blue-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Total</p>
+                  <p className="text-sm text-neutral-500">Total</p>
                   <p className="text-2xl font-bold">{stats.total}</p>
                 </div>
               </div>
@@ -308,7 +309,7 @@ export default function AdminCleaners() {
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-8 h-8 text-green-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Active</p>
+                  <p className="text-sm text-neutral-500">Active</p>
                   <p className="text-2xl font-bold">{stats.active}</p>
                 </div>
               </div>
@@ -317,7 +318,7 @@ export default function AdminCleaners() {
               <div className="flex items-center gap-3">
                 <Clock className="w-8 h-8 text-yellow-500" />
                 <div>
-                  <p className="text-sm text-gray-500">On Leave</p>
+                  <p className="text-sm text-neutral-500">On Leave</p>
                   <p className="text-2xl font-bold">{stats.onLeave}</p>
                 </div>
               </div>
@@ -326,7 +327,7 @@ export default function AdminCleaners() {
               <div className="flex items-center gap-3">
                 <Calendar className="w-8 h-8 text-purple-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Available</p>
+                  <p className="text-sm text-neutral-500">Available</p>
                   <p className="text-2xl font-bold">{stats.available}</p>
                 </div>
               </div>
@@ -335,7 +336,7 @@ export default function AdminCleaners() {
               <div className="flex items-center gap-3">
                 <Star className="w-8 h-8 text-yellow-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Avg Rating</p>
+                  <p className="text-sm text-neutral-500">Avg Rating</p>
                   <p className="text-2xl font-bold">{stats.avgRating}</p>
                 </div>
               </div>
@@ -344,7 +345,7 @@ export default function AdminCleaners() {
               <div className="flex items-center gap-3">
                 <TrendingUp className="w-8 h-8 text-orange-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Total Jobs</p>
+                  <p className="text-sm text-neutral-500">Total Jobs</p>
                   <p className="text-2xl font-bold">{stats.totalJobs}</p>
                 </div>
               </div>
@@ -360,7 +361,7 @@ export default function AdminCleaners() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="jobs" fill="#3B82F6" radius={[4, 4, 0, 0]} name="Jobs Completed" />
+                <Bar dataKey="jobs" fill={CHART_COLORS_STATUS.info} radius={[4, 4, 0, 0]} name="Jobs Completed" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -369,7 +370,7 @@ export default function AdminCleaners() {
           <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                 <input
                   type="text"
                   placeholder="Search cleaners..."
@@ -398,7 +399,7 @@ export default function AdminCleaners() {
                 </button>
                 <button
                   onClick={handleExport}
-                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-neutral-50 transition-all"
                 >
                   <Download className="w-4 h-4" />
                   Export
@@ -412,13 +413,13 @@ export default function AdminCleaners() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-sm text-gray-500 border-b bg-gray-50">
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('id')}>
+                  <tr className="text-left text-sm text-neutral-500 border-b bg-neutral-50">
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('id')}>
                       <div className="flex items-center gap-1">
                         ID {sortBy === 'id' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
                     </th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('name')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('name')}>
                       <div className="flex items-center gap-1">
                         Cleaner {sortBy === 'name' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
@@ -426,12 +427,12 @@ export default function AdminCleaners() {
                     <th className="px-4 py-4 font-medium">Contact</th>
                     <th className="px-4 py-4 font-medium">Location</th>
                     <th className="px-4 py-4 font-medium">Specialties</th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('rating')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('rating')}>
                       <div className="flex items-center gap-1">
                         Rating {sortBy === 'rating' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
                     </th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('totalJobs')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('totalJobs')}>
                       <div className="flex items-center gap-1">
                         Jobs {sortBy === 'totalJobs' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
@@ -443,7 +444,7 @@ export default function AdminCleaners() {
                 </thead>
                 <tbody>
                   {filteredCleaners.map((cleaner: any) => (
-                    <tr key={cleaner.id} className="border-b hover:bg-gray-50">
+                    <tr key={cleaner.id} className="border-b hover:bg-neutral-50">
                       <td className="px-4 py-4 font-medium">{cleaner.id}</td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
@@ -452,25 +453,25 @@ export default function AdminCleaners() {
                           </div>
                           <div>
                             <p className="font-medium">{cleaner.name}</p>
-                            <p className="text-sm text-gray-500">${cleaner.hourlyRate}/hr</p>
+                            <p className="text-sm text-neutral-500">${cleaner.hourlyRate}/hr</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 text-sm">
-                            <Mail className="w-3 h-3 text-gray-400" />
+                            <Mail className="w-3 h-3 text-neutral-400" />
                             {cleaner.email}
                           </div>
                           <div className="flex items-center gap-2 text-sm">
-                            <Phone className="w-3 h-3 text-gray-400" />
+                            <Phone className="w-3 h-3 text-neutral-400" />
                             {cleaner.phone}
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-2 text-sm">
-                          <MapPin className="w-3 h-3 text-gray-400" />
+                          <MapPin className="w-3 h-3 text-neutral-400" />
                           {cleaner.suburb}
                         </div>
                       </td>
@@ -508,14 +509,14 @@ export default function AdminCleaners() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleViewDetails(cleaner.id)}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-neutral-100 rounded"
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleEditCleaner(cleaner.id)}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-neutral-100 rounded"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4" />
@@ -558,7 +559,7 @@ export default function AdminCleaners() {
                           {cleaner.availability.includes(day) ? (
                             <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
                           ) : (
-                            <XCircle className="w-5 h-5 text-gray-300 mx-auto" />
+                            <XCircle className="w-5 h-5 text-neutral-300 mx-auto" />
                           )}
                         </td>
                       ))}
@@ -590,41 +591,41 @@ export default function AdminCleaners() {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold">{selectedCleanerData.name}</h4>
-                  <p className="text-gray-500">{selectedCleanerData.id} &middot; {selectedCleanerData.suburb}</p>
+                  <p className="text-neutral-500">{selectedCleanerData.id} &middot; {selectedCleanerData.suburb}</p>
                 </div>
               </div>
 
               {/* Contact Details */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-400" />
+                  <Mail className="w-4 h-4 text-neutral-400" />
                   <span>{selectedCleanerData.email}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gray-400" />
+                  <Phone className="w-4 h-4 text-neutral-400" />
                   <span>{selectedCleanerData.phone}</span>
                 </div>
               </div>
 
               {/* Stats */}
               <div className="grid grid-cols-4 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Rating</p>
+                <div className="bg-neutral-50 rounded-lg p-4 text-center">
+                  <p className="text-sm text-neutral-500">Rating</p>
                   <div className="flex items-center justify-center gap-1 mt-1">
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                     <p className="text-xl font-bold">{selectedCleanerData.rating}</p>
                   </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Total Jobs</p>
+                <div className="bg-neutral-50 rounded-lg p-4 text-center">
+                  <p className="text-sm text-neutral-500">Total Jobs</p>
                   <p className="text-xl font-bold">{selectedCleanerData.totalJobs}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Hourly Rate</p>
+                <div className="bg-neutral-50 rounded-lg p-4 text-center">
+                  <p className="text-sm text-neutral-500">Hourly Rate</p>
                   <p className="text-xl font-bold">${selectedCleanerData.hourlyRate}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Status</p>
+                <div className="bg-neutral-50 rounded-lg p-4 text-center">
+                  <p className="text-sm text-neutral-500">Status</p>
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[selectedCleanerData.status]}`}>
                     {selectedCleanerData.status}
                   </span>
@@ -653,7 +654,7 @@ export default function AdminCleaners() {
                       className={`px-3 py-1 rounded-full text-sm ${
                         selectedCleanerData.availability.includes(day)
                           ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-neutral-100 text-neutral-400'
                       }`}
                     >
                       {day}
@@ -668,7 +669,7 @@ export default function AdminCleaners() {
                 {selectedCleanerData.currentBooking ? (
                   <div className="p-4 bg-purple-50 rounded-lg">
                     <p className="font-medium">Booking: {selectedCleanerData.currentBooking}</p>
-                    <p className="text-sm text-gray-500">Next available: {selectedCleanerData.nextAvailable}</p>
+                    <p className="text-sm text-neutral-500">Next available: {selectedCleanerData.nextAvailable}</p>
                   </div>
                 ) : (
                   <div className="p-4 bg-green-50 rounded-lg">
@@ -676,7 +677,7 @@ export default function AdminCleaners() {
                       <CheckCircle className="w-4 h-4" />
                       Available for assignment
                     </p>
-                    <p className="text-sm text-gray-500">From: {selectedCleanerData.nextAvailable}</p>
+                    <p className="text-sm text-neutral-500">From: {selectedCleanerData.nextAvailable}</p>
                   </div>
                 )}
               </div>
@@ -685,7 +686,7 @@ export default function AdminCleaners() {
             <div className="p-6 border-t flex gap-3 justify-end sticky bottom-0 bg-white">
               <button
                 onClick={() => setShowDetails(false)}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border rounded-lg hover:bg-neutral-50"
               >
                 Close
               </button>
@@ -734,28 +735,28 @@ export default function AdminCleaners() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Full Name</label>
                 <input type="text" value={addForm.name} onChange={(e) => setAddForm({ ...addForm, name: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Email</label>
                 <input type="email" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="john@cleanpro.com.au" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
                 <input type="password" value={addForm.password} onChange={(e) => setAddForm({ ...addForm, password: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Min 8 characters" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Phone</label>
                 <input type="tel" value={addForm.phone} onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="04XX XXX XXX" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Hourly Rate ($)</label>
                 <input type="number" value={addForm.hourlyRate} onChange={(e) => setAddForm({ ...addForm, hourlyRate: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="30" />
               </div>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={handleAddCleaner} disabled={createStaffMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {createStaffMutation.isPending ? 'Adding...' : 'Add Cleaner'}
               </button>
@@ -776,16 +777,16 @@ export default function AdminCleaners() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Hourly Rate ($)</label>
                 <input type="number" value={editForm.hourlyRate} onChange={(e) => setEditForm({ ...editForm, hourlyRate: parseFloat(e.target.value) })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div className="flex items-center gap-2">
                 <input type="checkbox" checked={editForm.isActive} onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })} id="staffActive" className="rounded" />
-                <label htmlFor="staffActive" className="text-sm font-medium text-gray-700">Active</label>
+                <label htmlFor="staffActive" className="text-sm font-medium text-neutral-700">Active</label>
               </div>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={handleSaveEdit} disabled={updateStaffMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {updateStaffMutation.isPending ? 'Saving...' : 'Save Changes'}
               </button>
@@ -802,10 +803,10 @@ export default function AdminCleaners() {
               <h3 className="text-lg font-bold text-red-600">Delete Cleaner</h3>
             </div>
             <div className="p-6">
-              <p className="text-gray-600">Are you sure you want to delete this cleaner? They will be removed from all future bookings. This action cannot be undone.</p>
+              <p className="text-neutral-600">Are you sure you want to delete this cleaner? They will be removed from all future bookings. This action cannot be undone.</p>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={confirmDelete} disabled={deleteStaffMutation.isPending} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
                 {deleteStaffMutation.isPending ? 'Deleting...' : 'Delete'}
               </button>

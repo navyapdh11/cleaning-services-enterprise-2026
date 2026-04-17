@@ -38,6 +38,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { CHART_COLORS_PRIMARY, CHART_COLORS_REVENUE, CHART_COLORS_STATUS } from '@/lib/chartColors';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAdminDashboardOverview, useAdminBookings, useAdminAnalyticsData } from '@/lib/adminApi';
@@ -75,7 +76,7 @@ export default function AdminDashboard() {
   const serviceDistribution = (overview?.servicesByPopularity || []).map((s: any, i: number) => ({
     name: s.name,
     value: s.count,
-    color: ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#6B7280'][i] || '#6B7280',
+    color: CHART_COLORS_PRIMARY[i] || CHART_COLORS_STATUS.neutral,
   }));
 
   const recentBookings = (adminBookings?.data || []).map((b: any) => ({
@@ -90,7 +91,7 @@ export default function AdminDashboard() {
 
   if (loadingOverview) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
   const stats = overview?.overview || {};
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-neutral-100">
       <Header />
 
       {/* Mobile sidebar overlay */}
@@ -109,7 +110,7 @@ export default function AdminDashboard() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-neutral-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -128,7 +129,7 @@ export default function AdminDashboard() {
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                   link.href === '/admin/dashboard'
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
                 }`}
               >
                 <link.icon className="w-5 h-5" />
@@ -148,7 +149,7 @@ export default function AdminDashboard() {
               <Menu className="w-5 h-5" />
             </button>
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
               <input
                 type="text"
                 placeholder="Search..."
@@ -157,7 +158,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg">
+            <button className="relative p-2 hover:bg-neutral-100 rounded-lg">
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center">
                 {(adminBookings?.data || []).filter((b: any) => b.status === 'PENDING').length || 0}
@@ -167,7 +168,7 @@ export default function AdminDashboard() {
         </div>
 
         <main className="p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h1>
+          <h1 className="text-2xl font-bold text-neutral-900 mb-6">Dashboard Overview</h1>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -184,7 +185,7 @@ export default function AdminDashboard() {
                 )}
               </div>
               <h3 className="text-2xl font-bold">${Number(stats.monthlyRevenue || 0).toLocaleString()}</h3>
-              <p className="text-gray-500">Monthly Revenue</p>
+              <p className="text-neutral-500">Monthly Revenue</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -200,7 +201,7 @@ export default function AdminDashboard() {
                 )}
               </div>
               <h3 className="text-2xl font-bold">{Number(stats.totalBookings || 0).toLocaleString()}</h3>
-              <p className="text-gray-500">Total Bookings</p>
+              <p className="text-neutral-500">Total Bookings</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -216,7 +217,7 @@ export default function AdminDashboard() {
                 )}
               </div>
               <h3 className="text-2xl font-bold">{Number(stats.totalUsers || 0).toLocaleString()}</h3>
-              <p className="text-gray-500">Total Customers</p>
+              <p className="text-neutral-500">Total Customers</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -232,7 +233,7 @@ export default function AdminDashboard() {
                 )}
               </div>
               <h3 className="text-2xl font-bold">{Number(stats.activeBookings || 0).toLocaleString()}</h3>
-              <p className="text-gray-500">Active Bookings</p>
+              <p className="text-neutral-500">Active Bookings</p>
             </div>
           </div>
 
@@ -242,7 +243,7 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Revenue Trend</h3>
-                <BarChart3 className="w-5 h-5 text-gray-400" />
+                <BarChart3 className="w-5 h-5 text-neutral-400" />
               </div>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={revenueData}>
@@ -250,7 +251,7 @@ export default function AdminDashboard() {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
-                  <Area type="monotone" dataKey="revenue" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} />
+                  <Area type="monotone" dataKey="revenue" stroke={CHART_COLORS_REVENUE[0]} fill={CHART_COLORS_REVENUE[0]} fillOpacity={0.1} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -286,7 +287,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Booking Activity</h3>
-              <BarChart3 className="w-5 h-5 text-gray-400" />
+              <BarChart3 className="w-5 h-5 text-neutral-400" />
             </div>
             {overview?.bookingsByStatus && overview.bookingsByStatus.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
@@ -295,11 +296,11 @@ export default function AdminDashboard() {
                   <XAxis dataKey="status" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} name="Bookings" />
+                  <Bar dataKey="count" fill={CHART_COLORS_STATUS.info} radius={[4, 4, 0, 0]} name="Bookings" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[250px] flex items-center justify-center text-gray-400">
+              <div className="h-[250px] flex items-center justify-center text-neutral-400">
                 No booking activity data available
               </div>
             )}
@@ -317,7 +318,7 @@ export default function AdminDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-left text-sm text-gray-500 border-b">
+                    <tr className="text-left text-sm text-neutral-500 border-b">
                       <th className="px-6 py-4 font-medium">Booking ID</th>
                       <th className="px-6 py-4 font-medium">Customer</th>
                       <th className="px-6 py-4 font-medium">Service</th>
@@ -328,14 +329,14 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {recentBookings.map((booking: any) => (
-                      <tr key={booking.id} className="border-b hover:bg-gray-50">
+                      <tr key={booking.id} className="border-b hover:bg-neutral-50">
                         <td className="px-6 py-4 font-medium">{booking.id}</td>
                         <td className="px-6 py-4">{booking.customer}</td>
                         <td className="px-6 py-4">{booking.service}</td>
                         <td className="px-6 py-4">{booking.date} {booking.time}</td>
                         <td className="px-6 py-4 font-semibold">${booking.amount}</td>
                         <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[booking.status.toUpperCase()] || 'bg-gray-100 text-gray-700'}`}>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[booking.status.toUpperCase()] || 'bg-neutral-100 text-neutral-700'}`}>
                             {toTitleCase(booking.status)}
                           </span>
                         </td>
@@ -345,8 +346,8 @@ export default function AdminDashboard() {
                 </table>
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-500">
-                <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <div className="p-8 text-center text-neutral-500">
+                <Calendar className="w-12 h-12 mx-auto mb-4 text-neutral-300" />
                 <p>No bookings found yet</p>
               </div>
             )}
@@ -356,25 +357,25 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Link href="/admin/bookings?status=pending" className="p-4 border rounded-xl hover:bg-gray-50 transition-all text-center">
+              <Link href="/admin/bookings?status=pending" className="p-4 border rounded-xl hover:bg-neutral-50 transition-all text-center">
                 <Clock className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
                 <span className="font-medium">Pending Bookings</span>
-                <span className="block text-sm text-gray-500">5 awaiting</span>
+                <span className="block text-sm text-neutral-500">5 awaiting</span>
               </Link>
-              <Link href="/admin/cleaners" className="p-4 border rounded-xl hover:bg-gray-50 transition-all text-center">
+              <Link href="/admin/cleaners" className="p-4 border rounded-xl hover:bg-neutral-50 transition-all text-center">
                 <UserCheck className="w-8 h-8 text-green-500 mx-auto mb-2" />
                 <span className="font-medium">Assign Cleaner</span>
-                <span className="block text-sm text-gray-500">3 unassigned</span>
+                <span className="block text-sm text-neutral-500">3 unassigned</span>
               </Link>
-              <Link href="/admin/crm" className="p-4 border rounded-xl hover:bg-gray-50 transition-all text-center">
+              <Link href="/admin/crm" className="p-4 border rounded-xl hover:bg-neutral-50 transition-all text-center">
                 <Users className="w-8 h-8 text-blue-500 mx-auto mb-2" />
                 <span className="font-medium">View Customers</span>
-                <span className="block text-sm text-gray-500">1,248 total</span>
+                <span className="block text-sm text-neutral-500">1,248 total</span>
               </Link>
-              <Link href="/admin/bookings" className="p-4 border rounded-xl hover:bg-gray-50 transition-all text-center">
+              <Link href="/admin/bookings" className="p-4 border rounded-xl hover:bg-neutral-50 transition-all text-center">
                 <CheckCircle className="w-8 h-8 text-purple-500 mx-auto mb-2" />
                 <span className="font-medium">Completed Today</span>
-                <span className="block text-sm text-gray-500">12 done</span>
+                <span className="block text-sm text-neutral-500">12 done</span>
               </Link>
             </div>
           </div>

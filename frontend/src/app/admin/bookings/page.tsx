@@ -251,7 +251,7 @@ export default function AdminBookings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
@@ -267,7 +267,7 @@ export default function AdminBookings() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-neutral-100">
       <Header />
 
       {/* Mobile sidebar overlay */}
@@ -277,7 +277,7 @@ export default function AdminBookings() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-neutral-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -296,7 +296,7 @@ export default function AdminBookings() {
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                   link.href === '/admin/bookings'
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
                 }`}
               >
                 <link.icon className="w-5 h-5" />
@@ -318,7 +318,7 @@ export default function AdminBookings() {
             <h1 className="text-xl font-bold">Bookings Management</h1>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg">
+            <button className="relative p-2 hover:bg-neutral-100 rounded-lg">
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center">{stats.pending}</span>
             </button>
@@ -329,27 +329,27 @@ export default function AdminBookings() {
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
             <div className="bg-white rounded-lg p-4 shadow-sm">
-              <p className="text-sm text-gray-500">Total</p>
+              <p className="text-sm text-neutral-500">Total</p>
               <p className="text-2xl font-bold">{stats.total}</p>
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
-              <p className="text-sm text-gray-500">Pending</p>
+              <p className="text-sm text-neutral-500">Pending</p>
               <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
-              <p className="text-sm text-gray-500">Confirmed</p>
+              <p className="text-sm text-neutral-500">Confirmed</p>
               <p className="text-2xl font-bold text-green-600">{stats.confirmed}</p>
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
-              <p className="text-sm text-gray-500">Completed</p>
+              <p className="text-sm text-neutral-500">Completed</p>
               <p className="text-2xl font-bold text-blue-600">{stats.completed}</p>
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
-              <p className="text-sm text-gray-500">Cancelled</p>
+              <p className="text-sm text-neutral-500">Cancelled</p>
               <p className="text-2xl font-bold text-red-600">{stats.cancelled}</p>
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
-              <p className="text-sm text-gray-500">Revenue</p>
+              <p className="text-sm text-neutral-500">Revenue</p>
               <p className="text-2xl font-bold">${stats.revenue}</p>
             </div>
           </div>
@@ -358,7 +358,7 @@ export default function AdminBookings() {
           <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                 <input
                   type="text"
                   placeholder="Search bookings..."
@@ -381,7 +381,7 @@ export default function AdminBookings() {
                 </select>
                 <button
                   onClick={handleExport}
-                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-neutral-50 transition-all"
                 >
                   <Download className="w-4 h-4" />
                   Export
@@ -392,7 +392,7 @@ export default function AdminBookings() {
             {/* Bulk Actions */}
             {selectedBookings.length > 0 && (
               <div className="mt-4 pt-4 border-t flex items-center gap-4">
-                <span className="text-sm text-gray-600">{selectedBookings.length} selected</span>
+                <span className="text-sm text-neutral-600">{selectedBookings.length} selected</span>
                 <button onClick={() => handleBulkAction('confirm')} className="text-sm text-green-600 hover:underline">
                   Confirm Selected
                 </button>
@@ -408,7 +408,7 @@ export default function AdminBookings() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-sm text-gray-500 border-b bg-gray-50">
+                  <tr className="text-left text-sm text-neutral-500 border-b bg-neutral-50">
                     <th className="px-4 py-4">
                       <input
                         type="checkbox"
@@ -416,18 +416,18 @@ export default function AdminBookings() {
                         className="rounded"
                       />
                     </th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('id')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('id')}>
                       <div className="flex items-center gap-1">
                         ID {sortBy === 'id' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
                     </th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('customer')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('customer')}>
                       <div className="flex items-center gap-1">
                         Customer {sortBy === 'customer' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
                     </th>
                     <th className="px-4 py-4 font-medium">Service</th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('date')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('date')}>
                       <div className="flex items-center gap-1">
                         Date/Time {sortBy === 'date' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
@@ -441,7 +441,7 @@ export default function AdminBookings() {
                 </thead>
                 <tbody>
                   {filteredBookings.map((booking: any) => (
-                    <tr key={booking.id} className="border-b hover:bg-gray-50">
+                    <tr key={booking.id} className="border-b hover:bg-neutral-50">
                       <td className="px-4 py-4">
                         <input
                           type="checkbox"
@@ -454,13 +454,13 @@ export default function AdminBookings() {
                       <td className="px-4 py-4">
                         <div>
                           <p className="font-medium">{booking.customer}</p>
-                          <p className="text-sm text-gray-500">{booking.email}</p>
+                          <p className="text-sm text-neutral-500">{booking.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-4">{booking.service}</td>
                       <td className="px-4 py-4">
                         <p>{booking.date}</p>
-                        <p className="text-sm text-gray-500">{booking.time}</p>
+                        <p className="text-sm text-neutral-500">{booking.time}</p>
                       </td>
                       <td className="px-4 py-4">{booking.suburb}</td>
                       <td className="px-4 py-4">
@@ -488,14 +488,14 @@ export default function AdminBookings() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleViewBooking(booking.id)}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-neutral-100 rounded"
                             title="View"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleEditBooking(booking.id)}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-neutral-100 rounded"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4" />
@@ -516,8 +516,8 @@ export default function AdminBookings() {
             </div>
 
             {filteredBookings.length === 0 && (
-              <div className="p-8 text-center text-gray-500">
-                <Filter className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <div className="p-8 text-center text-neutral-500">
+                <Filter className="w-12 h-12 mx-auto mb-4 text-neutral-300" />
                 <p>No bookings found matching your criteria</p>
               </div>
             )}
@@ -530,7 +530,7 @@ export default function AdminBookings() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
             <h3 className="text-lg font-bold mb-4">Assign Cleaner</h3>
-            <p className="text-sm text-gray-600 mb-4">Booking: {bookingToAssign}</p>
+            <p className="text-sm text-neutral-600 mb-4">Booking: {bookingToAssign}</p>
             <select
               value={selectedCleaner}
               onChange={(e) => setSelectedCleaner(e.target.value)}
@@ -544,7 +544,7 @@ export default function AdminBookings() {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowAssignModal(false)}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border rounded-lg hover:bg-neutral-50"
               >
                 Cancel
               </button>
@@ -572,23 +572,23 @@ export default function AdminBookings() {
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><p className="text-sm text-gray-500">Booking ID</p><p className="font-medium">{selectedBookingDetails.id.substring(0, 8).toUpperCase()}</p></div>
-                <div><p className="text-sm text-gray-500">Status</p><span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[selectedBookingDetails.status]}`}>{selectedBookingDetails.status}</span></div>
-                <div><p className="text-sm text-gray-500">Customer</p><p className="font-medium">{selectedBookingDetails.customer?.user?.firstName} {selectedBookingDetails.customer?.user?.lastName}</p></div>
-                <div><p className="text-sm text-gray-500">Service</p><p className="font-medium">{selectedBookingDetails.service?.name}</p></div>
-                <div><p className="text-sm text-gray-500">Date</p><p className="font-medium">{new Date(selectedBookingDetails.date).toLocaleDateString()}</p></div>
-                <div><p className="text-sm text-gray-500">Time</p><p className="font-medium">{new Date(selectedBookingDetails.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p></div>
-                <div><p className="text-sm text-gray-500">Address</p><p className="font-medium">{selectedBookingDetails.address}</p></div>
-                <div><p className="text-sm text-gray-500">Total Price</p><p className="font-medium">${selectedBookingDetails.totalPrice}</p></div>
-                <div><p className="text-sm text-gray-500">Cleaner</p><p className="font-medium">{selectedBookingDetails.staff ? `${selectedBookingDetails.staff.user?.firstName} ${selectedBookingDetails.staff.user?.lastName}` : 'Not assigned'}</p></div>
-                <div><p className="text-sm text-gray-500">Created</p><p className="font-medium">{new Date(selectedBookingDetails.createdAt).toLocaleDateString()}</p></div>
+                <div><p className="text-sm text-neutral-500">Booking ID</p><p className="font-medium">{selectedBookingDetails.id.substring(0, 8).toUpperCase()}</p></div>
+                <div><p className="text-sm text-neutral-500">Status</p><span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[selectedBookingDetails.status]}`}>{selectedBookingDetails.status}</span></div>
+                <div><p className="text-sm text-neutral-500">Customer</p><p className="font-medium">{selectedBookingDetails.customer?.user?.firstName} {selectedBookingDetails.customer?.user?.lastName}</p></div>
+                <div><p className="text-sm text-neutral-500">Service</p><p className="font-medium">{selectedBookingDetails.service?.name}</p></div>
+                <div><p className="text-sm text-neutral-500">Date</p><p className="font-medium">{new Date(selectedBookingDetails.date).toLocaleDateString()}</p></div>
+                <div><p className="text-sm text-neutral-500">Time</p><p className="font-medium">{new Date(selectedBookingDetails.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p></div>
+                <div><p className="text-sm text-neutral-500">Address</p><p className="font-medium">{selectedBookingDetails.address}</p></div>
+                <div><p className="text-sm text-neutral-500">Total Price</p><p className="font-medium">${selectedBookingDetails.totalPrice}</p></div>
+                <div><p className="text-sm text-neutral-500">Cleaner</p><p className="font-medium">{selectedBookingDetails.staff ? `${selectedBookingDetails.staff.user?.firstName} ${selectedBookingDetails.staff.user?.lastName}` : 'Not assigned'}</p></div>
+                <div><p className="text-sm text-neutral-500">Created</p><p className="font-medium">{new Date(selectedBookingDetails.createdAt).toLocaleDateString()}</p></div>
               </div>
               {selectedBookingDetails.notes && (
-                <div><p className="text-sm text-gray-500">Notes</p><p className="text-sm">{selectedBookingDetails.notes}</p></div>
+                <div><p className="text-sm text-neutral-500">Notes</p><p className="text-sm">{selectedBookingDetails.notes}</p></div>
               )}
             </div>
             <div className="p-6 border-t flex justify-end">
-              <button onClick={() => { setShowViewModal(false); setBookingActionId(null); }} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Close</button>
+              <button onClick={() => { setShowViewModal(false); setBookingActionId(null); }} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Close</button>
             </div>
           </div>
         </div>
@@ -606,7 +606,7 @@ export default function AdminBookings() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date & Time</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Date & Time</label>
                 <input
                   type="datetime-local"
                   value={editForm.date || ''}
@@ -615,7 +615,7 @@ export default function AdminBookings() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Address</label>
                 <input
                   type="text"
                   value={editForm.address || ''}
@@ -624,7 +624,7 @@ export default function AdminBookings() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Notes</label>
                 <textarea
                   value={editForm.notes || ''}
                   onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
@@ -634,7 +634,7 @@ export default function AdminBookings() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Total Price ($)</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Total Price ($)</label>
                   <input
                     type="number"
                     value={editForm.totalPrice || ''}
@@ -643,7 +643,7 @@ export default function AdminBookings() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Status</label>
                   <select
                     value={editForm.status || ''}
                     onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
@@ -659,7 +659,7 @@ export default function AdminBookings() {
               </div>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => { setShowEditModal(false); setBookingActionId(null); }} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => { setShowEditModal(false); setBookingActionId(null); }} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={handleSaveEdit} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
             </div>
           </div>
@@ -674,10 +674,10 @@ export default function AdminBookings() {
               <h3 className="text-lg font-bold text-red-600">Delete Booking</h3>
             </div>
             <div className="p-6">
-              <p className="text-gray-600">Are you sure you want to delete this booking? This action cannot be undone.</p>
+              <p className="text-neutral-600">Are you sure you want to delete this booking? This action cannot be undone.</p>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => { setShowDeleteConfirm(false); setBookingActionId(null); }} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => { setShowDeleteConfirm(false); setBookingActionId(null); }} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete</button>
             </div>
           </div>

@@ -48,15 +48,18 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ error, errorInfo });
 
-    // Log to console
-    console.error('[ErrorBoundary]', error, errorInfo.componentStack);
+    // Log to console only in development
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('[ErrorBoundary]', error, errorInfo.componentStack);
+    }
 
     // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
 
     // Send to error monitoring service if configured
-    if (typeof window !== 'undefined' && (window as any).__errorReporting) {
-      (window as any).__errorReporting.captureException(error, {
+    if (typeof window !== 'undefined' && ((window as unknown) as Record<string, unknown>).__errorReporting) {
+      (((window as unknown) as Record<string, unknown>).__errorReporting as { captureException: (err: Error, ctx: Record<string, unknown>) => void })?.captureException(error, {
         componentStack: errorInfo.componentStack,
         timestamp: new Date().toISOString(),
       });

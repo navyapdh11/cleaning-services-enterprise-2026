@@ -111,6 +111,38 @@ export default function BookingPage() {
     },
   });
 
+  // Auto-save form data to localStorage
+  const formData = watch();
+  useEffect(() => {
+    try {
+      localStorage.setItem('booking-form-draft', JSON.stringify(formData));
+    } catch {
+      // Silently fail if localStorage unavailable
+    }
+  }, [formData]);
+
+  // Restore form data from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('booking-form-draft');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Only restore if form is still in default state (user hasn't started typing)
+        const hasDefaultValues = !formData.service && !formData.firstName && !formData.email;
+        if (hasDefaultValues) {
+          Object.entries(parsed).forEach(([key, value]) => {
+            if (value !== undefined && value !== '') {
+              setValue(key as keyof BookingForm, value as any);
+            }
+          });
+        }
+      }
+    } catch {
+      // Silently fail
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const selectedService = watch('service');
   const bedrooms = watch('bedrooms');
   const bathrooms = watch('bathrooms');
@@ -222,7 +254,8 @@ export default function BookingPage() {
         return;
       }
 
-      // Payment successful, redirect to confirmation
+      // Payment successful, clear saved form data and redirect to confirmation
+      try { localStorage.removeItem('booking-form-draft'); } catch {}
       router.push(`/confirmation?bookingId=${bookingId}&paymentIntentId=${paymentIntentId}`);
     } catch (err) {
       setStripeError(err instanceof Error ? err.message : 'An error occurred');

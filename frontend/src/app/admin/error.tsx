@@ -29,11 +29,23 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
       section: 'admin',
     };
 
-    console.error('[AdminError]', errorContext);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('[AdminError]', {
+        timestamp: new Date().toISOString(),
+        pathname: window.location.pathname,
+        errorMessage: error.message,
+        section: 'admin',
+      });
+    }
 
     // Send to error monitoring service if configured
-    if (typeof window !== 'undefined' && (window as any).__errorReporting) {
-      (window as any).__errorReporting.captureException(error, errorContext);
+    if (typeof window !== 'undefined' && ((window as unknown) as Record<string, unknown>).__errorReporting) {
+      (((window as unknown) as Record<string, unknown>).__errorReporting as { captureException: (err: Error, ctx: Record<string, unknown>) => void })?.captureException(error, {
+        timestamp: new Date().toISOString(),
+        pathname: window.location.pathname,
+        section: 'admin',
+      });
     }
   }, [error]);
 
@@ -59,7 +71,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-neutral-100 flex items-center justify-center px-4 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -74,7 +86,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
         >
           <div className="relative inline-block">
             <div className="absolute inset-0 bg-amber-500/20 blur-2xl rounded-full" />
-            <div className="relative bg-gray-900 rounded-2xl p-6 shadow-lg">
+            <div className="relative bg-neutral-900 rounded-2xl p-6 shadow-lg">
               <div className="flex items-center gap-3">
                 <Shield className="w-12 h-12 text-amber-400" />
                 <Lock className="w-6 h-6 text-amber-400" />
@@ -87,10 +99,10 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
+          className="bg-white rounded-2xl shadow-xl border border-neutral-200 overflow-hidden"
         >
           {/* Admin header */}
-          <div className="bg-gray-900 px-8 py-4">
+          <div className="bg-neutral-900 px-8 py-4">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-amber-400" />
               <h2 className="text-lg font-semibold text-white">Admin Panel Error</h2>
@@ -98,10 +110,10 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           </div>
 
           <div className="p-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
               Admin dashboard encountered an error
             </h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-neutral-600 mb-6">
               The admin panel experienced an unexpected error. Your session remains secure.
               Please try again or contact your system administrator if the issue persists.
             </p>
@@ -134,20 +146,20 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
             )}
 
             {/* Error context info */}
-            <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Error Context</h3>
-              <dl className="space-y-1 text-xs font-mono text-gray-600">
+            <div className="mb-6 p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+              <h3 className="text-sm font-semibold text-neutral-700 mb-2">Error Context</h3>
+              <dl className="space-y-1 text-xs font-mono text-neutral-600">
                 <div className="flex justify-between">
                   <dt>Path:</dt>
-                  <dd className="text-gray-800">{window.location?.pathname ?? 'unknown'}</dd>
+                  <dd className="text-neutral-800">{window.location?.pathname ?? 'unknown'}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt>Time:</dt>
-                  <dd className="text-gray-800">{new Date().toLocaleTimeString()}</dd>
+                  <dd className="text-neutral-800">{new Date().toLocaleTimeString()}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt>Error ID:</dt>
-                  <dd className="text-gray-800">{error.digest ?? 'N/A'}</dd>
+                  <dd className="text-neutral-800">{error.digest ?? 'N/A'}</dd>
                 </div>
               </dl>
             </div>
@@ -155,7 +167,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleReset}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 active:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-neutral-900 text-white rounded-xl font-semibold hover:bg-neutral-800 active:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
               >
                 <RefreshCw className="w-5 h-5" />
                 Reload Admin Panel
@@ -164,7 +176,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
               <button
                 onClick={handleCopyError}
                 disabled={copied}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2"
                 aria-label="Copy error details"
               >
                 <ClipboardCopy className="w-4 h-4" />
@@ -173,8 +185,8 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
             </div>
           </div>
 
-          <div className="px-8 py-4 bg-gray-50 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">
+          <div className="px-8 py-4 bg-neutral-50 border-t border-neutral-200">
+            <p className="text-xs text-neutral-500 text-center">
               If this error persists, contact the system administrator with the error details above.
             </p>
           </div>

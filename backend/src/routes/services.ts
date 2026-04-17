@@ -6,6 +6,7 @@ import { successResponse, paginatedResponse } from '../utils/apiResponse';
 import { AuthRequest, authenticate, authorize } from '../middleware/auth';
 import { generateSlug, paginate } from '../utils/helpers';
 import { ServiceType } from '@prisma/client';
+import { cacheService } from '../services/cacheService';
 
 const router = Router();
 
@@ -21,20 +22,30 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     if (type) where.type = type;
     if (search) where.OR = [{ name: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }];
 
-    const [services, total] = await Promise.all([
-      prisma.service.findMany({ where, skip, take, orderBy: { name: 'asc' } }),
-      prisma.service.count({ where }),
-    ]);
+    const cacheKey = `services:list:${page}:${limit}:${type || ''}:${search || ''}`;
 
-    return paginatedResponse(res, services, page, limit, total);
+    const result = await cacheService.wrap(cacheKey, async () => {
+      const [services, total] = await Promise.all([
+        prisma.service.findMany({ where, skip, take, orderBy: { name: 'asc' } }),
+        prisma.service.count({ where }),
+      ]);
+      return { services, total };
+    }, 300); // 5 min cache
+
+    return paginatedResponse(res, result.services, page, limit, result.total);
   } catch (error) { next(error); }
 });
 
 router.get('/:slug', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const slug = Array.isArray(req.params.slug) ? req.params.slug[0] : req.params.slug;
-    const service = await prisma.service.findUnique({ where: { slug } });
-    if (!service) throw new AppError(404, 'Service not found');
+
+    const service = await cacheService.wrap(`service:${slug}`, async () => {
+      const svc = await prisma.service.findUnique({ where: { slug } });
+      if (!svc) throw new AppError(404, 'Service not found');
+      return svc;
+    }, 600); // 10 min cache
+
     return successResponse(res, service);
   } catch (error) { next(error); }
 });
@@ -49,6 +60,7 @@ router.post('/', authenticate, authorize('ADMIN', 'MANAGER'),
       const service = await prisma.service.create({
         data: { name, slug: generateSlug(name), description, type, duration, basePrice, features, imageUrl },
       });
+      await cacheService.invalidate('service:*');
       return successResponse(res, service, 'Service created', 201);
     } catch (error) { next(error); }
   }
@@ -71,6 +83,7 @@ router.put('/:id', authenticate, authorize('ADMIN', 'MANAGER'),
       const data: Record<string, any> = { description, type, duration, basePrice, features, imageUrl, isActive };
       if (name) { data.name = name; data.slug = generateSlug(name); }
       const service = await prisma.service.update({ where: { id }, data });
+      await cacheService.invalidate('service:*');
       return successResponse(res, service, 'Service updated');
     } catch (error) { next(error); }
   }
@@ -80,6 +93,7 @@ router.delete('/:id', authenticate, authorize('ADMIN'), async (req: AuthRequest,
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     await prisma.service.delete({ where: { id } });
+    await cacheService.invalidate('service:*');
     return successResponse(res, null, 'Service deleted');
   } catch (error) { next(error); }
 });

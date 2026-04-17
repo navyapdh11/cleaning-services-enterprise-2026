@@ -173,7 +173,7 @@ export default function AdminCRM() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
@@ -185,7 +185,7 @@ export default function AdminCRM() {
   const avgRating = customers.length > 0 ? (customers.reduce((sum: number, c: any) => sum + c.rating, 0) / customers.length).toFixed(1) : '0';
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-neutral-100">
       <Header />
 
       {/* Mobile sidebar overlay */}
@@ -195,7 +195,7 @@ export default function AdminCRM() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-neutral-900 text-white transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -214,7 +214,7 @@ export default function AdminCRM() {
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                   link.href === '/admin/crm'
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
                 }`}
               >
                 <link.icon className="w-5 h-5" />
@@ -236,7 +236,7 @@ export default function AdminCRM() {
             <h1 className="text-xl font-bold">Customer Management (CRM)</h1>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg">
+            <button className="relative p-2 hover:bg-neutral-100 rounded-lg">
               <Bell className="w-5 h-5" />
             </button>
           </div>
@@ -249,7 +249,7 @@ export default function AdminCRM() {
               <div className="flex items-center gap-3">
                 <Users className="w-8 h-8 text-blue-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Total Customers</p>
+                  <p className="text-sm text-neutral-500">Total Customers</p>
                   <p className="text-2xl font-bold">{totalCustomers}</p>
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function AdminCRM() {
               <div className="flex items-center gap-3">
                 <DollarSign className="w-8 h-8 text-green-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Total Revenue</p>
+                  <p className="text-sm text-neutral-500">Total Revenue</p>
                   <p className="text-2xl font-bold">${totalRevenue.toLocaleString()}</p>
                 </div>
               </div>
@@ -267,7 +267,7 @@ export default function AdminCRM() {
               <div className="flex items-center gap-3">
                 <Clock className="w-8 h-8 text-purple-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Avg Bookings</p>
+                  <p className="text-sm text-neutral-500">Avg Bookings</p>
                   <p className="text-2xl font-bold">{avgBookings}</p>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export default function AdminCRM() {
               <div className="flex items-center gap-3">
                 <Star className="w-8 h-8 text-yellow-500" />
                 <div>
-                  <p className="text-sm text-gray-500">Avg Rating</p>
+                  <p className="text-sm text-neutral-500">Avg Rating</p>
                   <p className="text-2xl font-bold">{avgRating}</p>
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function AdminCRM() {
           <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                 <input
                   type="text"
                   placeholder="Search customers..."
@@ -305,7 +305,7 @@ export default function AdminCRM() {
               </button>
               <button
                 onClick={handleExport}
-                className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 transition-all"
+                className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-neutral-50 transition-all"
               >
                 <Download className="w-4 h-4" />
                 Export
@@ -318,25 +318,25 @@ export default function AdminCRM() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-sm text-gray-500 border-b bg-gray-50">
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('id')}>
+                  <tr className="text-left text-sm text-neutral-500 border-b bg-neutral-50">
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('id')}>
                       <div className="flex items-center gap-1">
                         ID {sortBy === 'id' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
                     </th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('name')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('name')}>
                       <div className="flex items-center gap-1">
                         Customer {sortBy === 'name' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
                     </th>
                     <th className="px-4 py-4 font-medium">Contact</th>
                     <th className="px-4 py-4 font-medium">Location</th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('totalBookings')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('totalBookings')}>
                       <div className="flex items-center gap-1">
                         Bookings {sortBy === 'totalBookings' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
                     </th>
-                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-gray-700" onClick={() => handleSort('totalSpent')}>
+                    <th className="px-4 py-4 font-medium cursor-pointer hover:text-neutral-700" onClick={() => handleSort('totalSpent')}>
                       <div className="flex items-center gap-1">
                         Revenue {sortBy === 'totalSpent' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
                       </div>
@@ -347,29 +347,29 @@ export default function AdminCRM() {
                 </thead>
                 <tbody>
                   {filteredCustomers.map((customer: any) => (
-                    <tr key={customer.id} className="border-b hover:bg-gray-50">
+                    <tr key={customer.id} className="border-b hover:bg-neutral-50">
                       <td className="px-4 py-4 font-medium">{customer.id}</td>
                       <td className="px-4 py-4">
                         <div>
                           <p className="font-medium">{customer.name}</p>
-                          <p className="text-sm text-gray-500">Since {customer.joinDate}</p>
+                          <p className="text-sm text-neutral-500">Since {customer.joinDate}</p>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 text-sm">
-                            <Mail className="w-3 h-3 text-gray-400" />
+                            <Mail className="w-3 h-3 text-neutral-400" />
                             {customer.email}
                           </div>
                           <div className="flex items-center gap-2 text-sm">
-                            <Phone className="w-3 h-3 text-gray-400" />
+                            <Phone className="w-3 h-3 text-neutral-400" />
                             {customer.phone}
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-2 text-sm">
-                          <MapPin className="w-3 h-3 text-gray-400" />
+                          <MapPin className="w-3 h-3 text-neutral-400" />
                           {customer.suburb}
                         </div>
                       </td>
@@ -385,7 +385,7 @@ export default function AdminCRM() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleViewDetails(customer.id)}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-neutral-100 rounded"
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />
@@ -398,7 +398,7 @@ export default function AdminCRM() {
                                 setShowEditModal(true);
                               }
                             }}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-neutral-100 rounded"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4" />
@@ -446,22 +446,22 @@ export default function AdminCRM() {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold">{selectedCustomerData.name}</h4>
-                  <p className="text-gray-500">{selectedCustomerData.id}</p>
+                  <p className="text-neutral-500">{selectedCustomerData.id}</p>
                 </div>
               </div>
 
               {/* Contact Details */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-400" />
+                  <Mail className="w-4 h-4 text-neutral-400" />
                   <span>{selectedCustomerData.email}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gray-400" />
+                  <Phone className="w-4 h-4 text-neutral-400" />
                   <span>{selectedCustomerData.phone}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400" />
+                  <MapPin className="w-4 h-4 text-neutral-400" />
                   <span>{selectedCustomerData.address}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -472,16 +472,16 @@ export default function AdminCRM() {
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Total Bookings</p>
+                <div className="bg-neutral-50 rounded-lg p-4 text-center">
+                  <p className="text-sm text-neutral-500">Total Bookings</p>
                   <p className="text-xl font-bold">{selectedCustomerData.totalBookings}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Total Spent</p>
+                <div className="bg-neutral-50 rounded-lg p-4 text-center">
+                  <p className="text-sm text-neutral-500">Total Spent</p>
                   <p className="text-xl font-bold">${selectedCustomerData.totalSpent.toLocaleString()}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">Last Booking</p>
+                <div className="bg-neutral-50 rounded-lg p-4 text-center">
+                  <p className="text-sm text-neutral-500">Last Booking</p>
                   <p className="text-xl font-bold">{selectedCustomerData.lastBooking}</p>
                 </div>
               </div>
@@ -498,10 +498,10 @@ export default function AdminCRM() {
               {customerBookings.length > 0 ? (
                 <div className="space-y-2">
                   {customerBookings.map((booking, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
                       <div>
                         <p className="font-medium">{booking.service}</p>
-                        <p className="text-sm text-gray-500">{booking.date}</p>
+                        <p className="text-sm text-neutral-500">{booking.date}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">${booking.amount}</p>
@@ -513,14 +513,14 @@ export default function AdminCRM() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm">No booking history available</p>
+                <p className="text-neutral-500 text-sm">No booking history available</p>
               )}
             </div>
 
             <div className="p-6 border-t flex gap-3 justify-end sticky bottom-0 bg-white">
               <button
                 onClick={() => { setShowDetails(false); setSelectedCustomerFullId(null); }}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border rounded-lg hover:bg-neutral-50"
               >
                 Close
               </button>
@@ -569,29 +569,29 @@ export default function AdminCRM() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">First Name</label>
                   <input type="text" value={addForm.firstName} onChange={(e) => setAddForm({ ...addForm, firstName: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Last Name</label>
                   <input type="text" value={addForm.lastName} onChange={(e) => setAddForm({ ...addForm, lastName: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Email</label>
                 <input type="email" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
                 <input type="password" value={addForm.password} onChange={(e) => setAddForm({ ...addForm, password: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Phone</label>
                 <input type="tel" value={addForm.phone} onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={handleAddCustomer} disabled={createUserMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {createUserMutation.isPending ? 'Creating...' : 'Add Customer'}
               </button>
@@ -612,7 +612,7 @@ export default function AdminCRM() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Role</label>
                 <select value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="CUSTOMER">Customer</option>
                   <option value="STAFF">Staff</option>
@@ -622,11 +622,11 @@ export default function AdminCRM() {
               </div>
               <div className="flex items-center gap-2">
                 <input type="checkbox" checked={editForm.isActive} onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })} id="isActive" className="rounded" />
-                <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Active Account</label>
+                <label htmlFor="isActive" className="text-sm font-medium text-neutral-700">Active Account</label>
               </div>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={handleEditCustomer} disabled={updateUserMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {updateUserMutation.isPending ? 'Saving...' : 'Save Changes'}
               </button>
@@ -643,10 +643,10 @@ export default function AdminCRM() {
               <h3 className="text-lg font-bold text-red-600">Delete Customer</h3>
             </div>
             <div className="p-6">
-              <p className="text-gray-600">Are you sure you want to delete this customer? This action cannot be undone and will remove all associated data.</p>
+              <p className="text-neutral-600">Are you sure you want to delete this customer? This action cannot be undone and will remove all associated data.</p>
             </div>
             <div className="p-6 border-t flex gap-3 justify-end">
-              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 border rounded-lg hover:bg-neutral-50">Cancel</button>
               <button onClick={handleDeleteCustomer} disabled={deleteUserMutation.isPending} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
                 {deleteUserMutation.isPending ? 'Deleting...' : 'Delete'}
               </button>

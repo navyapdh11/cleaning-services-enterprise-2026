@@ -7,11 +7,11 @@ import { AuthRequest, authenticate, authorize } from '../middleware/auth';
 import { paginate } from '../utils/helpers';
 import bcrypt from 'bcryptjs';
 import { UserRole } from '@prisma/client';
-import { strictLimiter } from '../middleware/rateLimiter';
+import { strictLimiter, adminLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
-router.use(authenticate, authorize('ADMIN', 'MANAGER'));
+router.use(authenticate, authorize('ADMIN', 'MANAGER'), adminLimiter);
 
 // User management
 router.get('/users', async (req: AuthRequest, res: Response, next: NextFunction) => {

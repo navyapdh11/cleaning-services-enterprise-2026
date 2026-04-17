@@ -28,11 +28,22 @@ export default function GlobalError({ error, reset }: ErrorProps) {
       digest: error.digest,
     };
 
-    console.error('[GlobalError]', errorContext);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('[GlobalError]', {
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        pathname: window.location.pathname,
+        errorMessage: error.message,
+      });
+    }
 
     // Send to error monitoring service if configured
-    if (typeof window !== 'undefined' && (window as any).__errorReporting) {
-      (window as any).__errorReporting.captureException(error, errorContext);
+    if (typeof window !== 'undefined' && ((window as unknown) as Record<string, unknown>).__errorReporting) {
+      (((window as unknown) as Record<string, unknown>).__errorReporting as { captureException: (err: Error, ctx: Record<string, unknown>) => void })?.captureException(error, {
+        timestamp: new Date().toISOString(),
+        pathname: window.location.pathname,
+      });
     }
   }, [error]);
 
