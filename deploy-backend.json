@@ -10,7 +10,7 @@
   "autoDeploy": "yes",
   "serviceDetails": {
     "env": "node",
-    "buildCommand": "npm install && npx prisma generate && npx tsc",
+    "buildCommand": "npm install --include=dev && npx prisma generate && npx tsc",
     "startCommand": "node dist/server.js",
     "healthCheckPath": "/health",
     "plan": "free",
