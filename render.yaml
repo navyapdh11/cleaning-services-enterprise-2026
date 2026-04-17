@@ -20,10 +20,7 @@ services:
           name: cleanpro-db
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: cleanpro-redis
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
@@ -40,25 +37,6 @@ services:
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
-
-  # Frontend (Vercel handles this, but included for completeness)
-  - type: web
-    name: cleanpro-frontend
-    env: node
-    region: oregon
-    plan: starter
-    branch: main
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: NEXT_PUBLIC_API_URL
-        fromService:
-          name: cleanpro-backend
-          type: web
-          envVarKey: RENDER_EXTERNAL_URL
 
 databases:
   - name: cleanpro-db
